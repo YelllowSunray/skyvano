@@ -72,6 +72,18 @@ export const houses = [
   "Saint Laurent",
 ];
 
+export function brandToSlug(brand: string) {
+  return brand.toLowerCase().replace(/\s+/g, "-");
+}
+
+export function getBrand(slug: string) {
+  return houses.find((house) => brandToSlug(house) === slug);
+}
+
+export function getProductsByBrand(brand: string) {
+  return products.filter((product) => product.brand === brand);
+}
+
 export const products: Product[] = [
   {
     id: "sv-001",

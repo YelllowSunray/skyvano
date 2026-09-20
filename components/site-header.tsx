@@ -10,15 +10,22 @@ import {
   UserIcon,
 } from "@/components/icons";
 import { useStore } from "@/components/store-provider";
+import { brandToSlug, houses } from "@/lib/products";
 
-const nav = [
+const leftNav = [
   { href: "/collections/new-arrivals", label: "New Arrivals" },
   { href: "/collections/women", label: "Women" },
   { href: "/collections/men", label: "Men" },
+];
+
+const rightNav = [
+  { href: "/brands", label: "Brands" },
   { href: "/collections/accessories", label: "Accessories" },
   { href: "/collections/best-sellers", label: "Best Sellers" },
   { href: "/collections/sale", label: "Sale" },
 ];
+
+const nav = [...leftNav, ...rightNav];
 
 const messages = [
   "Complimentary European shipping on orders over €150",
@@ -66,8 +73,8 @@ export function SiteHeader() {
             >
               <MenuIcon />
             </button>
-            <nav className="hidden items-center gap-6 text-[11px] uppercase tracking-[0.22em] lg:flex">
-              {nav.slice(0, 3).map((item) => (
+            <nav className="hidden items-center gap-5 text-[11px] uppercase tracking-[0.22em] xl:gap-6 lg:flex">
+              {leftNav.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -100,18 +107,46 @@ export function SiteHeader() {
           </Link>
 
           <div className="flex items-center justify-end gap-0.5 sm:gap-2">
-            <nav className="mr-2 hidden items-center gap-6 text-[11px] uppercase tracking-[0.22em] lg:flex">
-              {nav.slice(3).map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`transition-colors hover:text-gold ${
-                    item.label === "Sale" ? "text-gold" : "text-ink/80"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
+            <nav className="mr-1 hidden items-center gap-5 text-[11px] uppercase tracking-[0.22em] xl:mr-2 xl:gap-6 lg:flex">
+              {rightNav.map((item) =>
+                item.label === "Brands" ? (
+                  <div key={item.href} className="group relative">
+                    <Link
+                      href={item.href}
+                      className="inline-flex h-16 items-center text-ink/80 transition-colors hover:text-gold group-hover:text-gold"
+                    >
+                      {item.label}
+                    </Link>
+                    <div className="invisible absolute left-0 top-full z-50 min-w-52 border border-line bg-ivory py-3 opacity-0 shadow-sm transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                      {houses.map((house) => (
+                        <Link
+                          key={house}
+                          href={`/brands/${brandToSlug(house)}`}
+                          className="block px-5 py-2 text-[11px] tracking-[0.18em] text-ink/80 hover:text-gold"
+                        >
+                          {house}
+                        </Link>
+                      ))}
+                      <Link
+                        href="/brands"
+                        className="mt-1 block border-t border-line px-5 pt-3 text-[11px] tracking-[0.18em] text-gold"
+                      >
+                        Shop all brands
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`transition-colors hover:text-gold ${
+                      item.label === "Sale" ? "text-gold" : "text-ink/80"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ),
+              )}
             </nav>
             <button
               type="button"
@@ -173,6 +208,18 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
+            <div className="mt-4 grid gap-1 pb-2">
+              {houses.map((house) => (
+                <Link
+                  key={house}
+                  href={`/brands/${brandToSlug(house)}`}
+                  onClick={closeMenu}
+                  className="py-1.5 text-sm uppercase tracking-[0.18em] text-muted"
+                >
+                  {house}
+                </Link>
+              ))}
+            </div>
             <div className="mt-6 grid gap-3 border-t border-line pt-6 text-sm uppercase tracking-[0.2em] text-muted">
               <Link href="/account" onClick={closeMenu} className="py-1">
                 Account
