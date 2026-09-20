@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef } from "react";
 import { ProductCard } from "@/components/product-card";
 import { products } from "@/lib/products";
@@ -9,7 +10,7 @@ export function BestSellers() {
   const items = products.filter((product) => product.tags.includes("bestseller"));
 
   const scroll = (direction: number) => {
-    scroller.current?.scrollBy({ left: direction * 280, behavior: "smooth" });
+    scroller.current?.scrollBy({ left: direction * 320, behavior: "smooth" });
   };
 
   return (
@@ -24,7 +25,13 @@ export function BestSellers() {
               Best sellers
             </h2>
           </div>
-          <div className="flex gap-2">
+          <Link
+            href="/collections/best-sellers"
+            className="shrink-0 text-[11px] uppercase tracking-[0.18em] underline decoration-gold underline-offset-8 md:hidden"
+          >
+            View all
+          </Link>
+          <div className="hidden gap-2 md:flex">
             <button
               type="button"
               onClick={() => scroll(-1)}
@@ -43,15 +50,19 @@ export function BestSellers() {
             </button>
           </div>
         </div>
+
+        <div className="grid grid-cols-2 gap-x-3 gap-y-8 md:hidden">
+          {items.slice(0, 4).map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+
         <div
           ref={scroller}
-          className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 touch-pan-x md:mx-0 md:px-0"
+          className="no-scrollbar hidden snap-x gap-5 overflow-x-auto md:flex"
         >
           {items.map((product) => (
-            <div
-              key={product.id}
-              className="w-[72vw] max-w-[280px] shrink-0 snap-start sm:w-[260px] md:w-[300px] md:max-w-none"
-            >
+            <div key={product.id} className="w-[300px] shrink-0 snap-start">
               <ProductCard product={product} />
             </div>
           ))}
