@@ -28,7 +28,7 @@ export function ProductDetail({ product }: { product: Product }) {
   };
 
   return (
-    <div className="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:gap-10 sm:py-12 md:grid-cols-2 md:px-8 lg:gap-16">
+    <div className="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:gap-10 sm:py-8 md:grid-cols-2 md:px-8 lg:gap-16">
       <div>
         <div className="relative aspect-[4/5] overflow-hidden bg-white">
           <Image
