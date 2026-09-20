@@ -4,7 +4,6 @@ import { CartDrawer } from "@/components/cart-drawer";
 import { SearchModal } from "@/components/search-modal";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { SmartBack } from "@/components/smart-back";
 import { StoreProvider } from "@/components/store-provider";
 import { Toast } from "@/components/toast";
 import "./globals.css";
@@ -44,12 +43,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${outfit.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="flex min-h-dvh flex-col overflow-x-clip bg-cream font-sans text-ink">
         <StoreProvider>
           <SiteHeader />
-          <SmartBack />
           <main className="flex-1">{children}</main>
           <SiteFooter />
           <CartDrawer />

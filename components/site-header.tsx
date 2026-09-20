@@ -10,6 +10,7 @@ import {
   UserIcon,
 } from "@/components/icons";
 import { useStore } from "@/components/store-provider";
+import { NavbarBackButton } from "@/components/smart-back";
 import { brandToSlug, houses } from "@/lib/products";
 
 const leftNav = [
@@ -64,7 +65,8 @@ export function SiteHeader() {
 
       <div className="border-b border-line bg-ivory/95 backdrop-blur-md">
         <div className="relative mx-auto flex h-14 max-w-7xl items-center justify-between px-3 sm:h-16 sm:px-5 lg:grid lg:grid-cols-3 lg:px-8">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
+            <NavbarBackButton />
             <button
               type="button"
               className="flex h-11 w-11 items-center justify-center lg:hidden"

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { BackIcon } from "@/components/icons";
 
 const STACK_KEY = "skyvano:nav-stack";
@@ -35,7 +35,7 @@ function getFallback(pathname: string) {
   return { href: "/", label: "Home" };
 }
 
-export function SmartBack() {
+export function useSmartBack() {
   const pathname = usePathname();
   const router = useRouter();
   const [canGoBack, setCanGoBack] = useState(false);
@@ -49,48 +49,52 @@ export function SmartBack() {
     if (isHome) {
       writeStack(["/"]);
       setCanGoBack(false);
-      return;
-    }
-
-    if (stack.length >= 2 && stack[stack.length - 2] === pathname) {
+    } else if (stack.length >= 2 && stack[stack.length - 2] === pathname) {
       stack.pop();
       writeStack(stack);
       setCanGoBack(stack.length >= 2);
-      return;
+    } else {
+      if (stack[stack.length - 1] !== pathname) {
+        stack.push(pathname);
+        writeStack(stack);
+      }
+      setCanGoBack(stack.length >= 2);
     }
 
-    if (stack[stack.length - 1] !== pathname) {
-      stack.push(pathname);
-      writeStack(stack);
-    }
-
-    setCanGoBack(stack.length >= 2);
+    window.history.scrollRestoration = "manual";
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    });
   }, [isHome, pathname]);
 
-  if (isHome) return null;
+  const goBack = useCallback(() => {
+    if (canGoBack && window.history.length > 1) {
+      router.back();
+      return;
+    }
+    writeStack([fallback.href]);
+    router.push(fallback.href);
+  }, [canGoBack, fallback.href, router]);
 
   const label = canGoBack ? "Back" : `Back to ${fallback.label}`;
 
+  return { isHome, label, goBack };
+}
+
+export function NavbarBackButton() {
+  const { isHome, label, goBack } = useSmartBack();
+
+  if (isHome) return null;
+
   return (
-    <div className="border-b border-line bg-ivory/95 md:bg-transparent">
-      <div className="mx-auto flex max-w-7xl items-center px-2 sm:px-4 md:px-8">
-        <button
-          type="button"
-          onClick={() => {
-            if (canGoBack && window.history.length > 1) {
-              router.back();
-              return;
-            }
-            writeStack([fallback.href]);
-            router.push(fallback.href);
-          }}
-          className="flex min-h-11 items-center gap-1 px-2 text-[11px] uppercase tracking-[0.2em] text-ink/80 transition-colors hover:text-gold sm:px-0"
-          aria-label={label}
-        >
-          <BackIcon className="h-4 w-4" />
-          {label}
-        </button>
-      </div>
-    </div>
+    <button
+      type="button"
+      onClick={goBack}
+      className="flex h-11 w-11 items-center justify-center text-ink lg:hidden"
+      aria-label={label}
+    >
+      <BackIcon className="h-5 w-5" />
+    </button>
   );
 }
