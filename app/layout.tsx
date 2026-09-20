@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
 import { CartDrawer } from "@/components/cart-drawer";
+import { ClientCleanup } from "@/components/client-cleanup";
 import { SearchModal } from "@/components/search-modal";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -31,6 +32,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  appleWebApp: {
+    capable: false,
+    title: "Skyvano",
+  },
 };
 
 export const viewport: Viewport = {
@@ -48,6 +53,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-dvh flex-col overflow-x-clip bg-cream font-sans text-ink">
         <StoreProvider>
+          <ClientCleanup />
           <SiteHeader />
           <main className="flex-1">{children}</main>
           <SiteFooter />

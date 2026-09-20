@@ -1,0 +1,11 @@
+{
+  "name": "Skyvano",
+  "short_name": "Skyvano",
+  "description": "Skyvano luxury boutique",
+  "start_url": "https://www.skyvano.com/",
+  "scope": "https://www.skyvano.com/",
+  "id": "https://www.skyvano.com/",
+  "display": "browser",
+  "background_color": "#f7f4ee",
+  "theme_color": "#c6a15b"
+}
