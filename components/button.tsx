@@ -25,7 +25,7 @@ export function Button({
   type = "button",
   onClick,
 }: ButtonProps) {
-  const classes = `inline-flex items-center justify-center rounded-sm px-7 py-3 text-[11px] font-medium uppercase tracking-[0.22em] transition-colors duration-300 ${styles[variant]} ${className}`;
+  const classes = `inline-flex min-h-11 items-center justify-center rounded-sm px-5 py-3 text-center text-[11px] font-medium uppercase tracking-[0.16em] transition-colors duration-300 sm:px-7 sm:tracking-[0.22em] ${styles[variant]} ${className}`;
 
   if (href) {
     return (

@@ -13,7 +13,7 @@ export default function AboutPage() {
       <PageIntro eyebrow="The house" title="About Skyvano">
         A boutique for people who want designer clothing without the noise.
       </PageIntro>
-      <div className="relative mx-auto mb-12 h-[420px] max-w-5xl overflow-hidden">
+      <div className="relative mx-auto mb-8 h-56 max-w-5xl overflow-hidden sm:mb-12 sm:h-80 md:h-[420px]">
         <Image
           src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80"
           alt="Skyvano boutique"

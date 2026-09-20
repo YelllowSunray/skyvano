@@ -10,15 +10,19 @@ export function PageIntro({
   children?: React.ReactNode;
 }) {
   return (
-    <header className="mx-auto max-w-3xl px-4 pb-12 pt-16 text-center md:px-8">
+    <header className="mx-auto max-w-3xl px-4 pb-8 pt-10 text-center sm:pb-12 sm:pt-16 md:px-8">
       {eyebrow ? (
         <p className="mb-3 text-[11px] uppercase tracking-[0.28em] text-gold">
           {eyebrow}
         </p>
       ) : null}
-      <h1 className="font-serif text-5xl md:text-6xl">{title}</h1>
+      <h1 className="break-words font-serif text-4xl sm:text-5xl md:text-6xl">
+        {title}
+      </h1>
       {children ? (
-        <div className="mt-5 text-base leading-7 text-muted">{children}</div>
+        <div className="mt-4 text-sm leading-7 text-muted sm:mt-5 sm:text-base">
+          {children}
+        </div>
       ) : null}
     </header>
   );
@@ -26,7 +30,7 @@ export function PageIntro({
 
 export function Prose({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto max-w-3xl px-4 pb-24 text-base leading-8 text-ink/85 md:px-8">
+    <div className="mx-auto max-w-3xl px-4 pb-16 text-base leading-8 text-ink/85 sm:pb-24 md:px-8">
       {children}
     </div>
   );

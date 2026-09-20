@@ -36,9 +36,9 @@ export default async function ProductPage({
     <>
       <ProductDetail product={product} />
       {related.length > 0 ? (
-        <section className="mx-auto max-w-7xl px-4 pb-20 md:px-8">
-          <h2 className="mb-8 font-serif text-4xl">You may also like</h2>
-          <div className="grid grid-cols-2 gap-5 md:grid-cols-4">
+        <section className="mx-auto max-w-7xl px-4 pb-28 md:px-8 md:pb-20">
+          <h2 className="mb-6 font-serif text-3xl sm:mb-8 sm:text-4xl">You may also like</h2>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-5 md:grid-cols-4">
             {related.map((item) => (
               <ProductCard key={item.id} product={item} />
             ))}

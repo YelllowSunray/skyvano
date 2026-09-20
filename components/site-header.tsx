@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect } from "react";
 import {
   BagIcon,
   CloseIcon,
@@ -37,13 +36,6 @@ export function SiteHeader() {
     closeMenu,
   } = useStore();
 
-  useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isMenuOpen]);
-
   return (
     <header className="sticky top-0 z-50">
       <div className="overflow-hidden bg-ink text-gold">
@@ -51,10 +43,10 @@ export function SiteHeader() {
           {[0, 1].map((copy) => (
             <p
               key={copy}
-              className="flex items-center py-2.5 text-[11px] uppercase tracking-[0.28em]"
+              className="flex items-center py-2 text-[10px] uppercase tracking-[0.22em] sm:py-2.5 sm:text-[11px] sm:tracking-[0.28em]"
             >
               {messages.map((message) => (
-                <span key={`${copy}-${message}`} className="px-8">
+                <span key={`${copy}-${message}`} className="px-5 sm:px-8">
                   {message}
                 </span>
               ))}
@@ -63,12 +55,12 @@ export function SiteHeader() {
         </div>
       </div>
 
-      <div className="border-b border-line bg-ivory/90 backdrop-blur-md">
-        <div className="mx-auto grid max-w-7xl grid-cols-3 items-center px-4 py-3 md:px-8">
+      <div className="border-b border-line bg-ivory/95 backdrop-blur-md">
+        <div className="relative mx-auto flex h-14 max-w-7xl items-center justify-between px-3 sm:h-16 sm:px-5 lg:grid lg:grid-cols-3 lg:px-8">
           <div className="flex items-center gap-3">
             <button
               type="button"
-              className="lg:hidden"
+              className="flex h-11 w-11 items-center justify-center lg:hidden"
               onClick={openMenu}
               aria-label="Open menu"
             >
@@ -87,24 +79,27 @@ export function SiteHeader() {
             </nav>
           </div>
 
-          <Link href="/" className="justify-self-center">
+          <Link
+            href="/"
+            className="absolute left-1/2 -translate-x-1/2 lg:static lg:justify-self-center lg:translate-x-0"
+          >
             <span className="sr-only">Skyvano</span>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Image
                 src="/logo.png"
                 alt="Skyvano"
                 width={48}
                 height={48}
-                className="h-11 w-11 rounded-sm object-cover"
+                className="h-9 w-9 rounded-sm object-cover sm:h-11 sm:w-11"
                 priority
               />
-              <span className="hidden font-serif text-2xl tracking-[0.28em] text-ink sm:block">
+              <span className="hidden font-serif text-2xl tracking-[0.28em] text-ink md:block">
                 SKYVANO
               </span>
             </div>
           </Link>
 
-          <div className="flex items-center justify-end gap-4">
+          <div className="flex items-center justify-end gap-0.5 sm:gap-2">
             <nav className="mr-2 hidden items-center gap-6 text-[11px] uppercase tracking-[0.22em] lg:flex">
               {nav.slice(3).map((item) => (
                 <Link
@@ -118,21 +113,30 @@ export function SiteHeader() {
                 </Link>
               ))}
             </nav>
-            <button type="button" onClick={openSearch} aria-label="Search">
+            <button
+              type="button"
+              className="flex h-11 w-11 items-center justify-center"
+              onClick={openSearch}
+              aria-label="Search"
+            >
               <SearchIcon />
             </button>
-            <Link href="/account" aria-label="Account">
+            <Link
+              href="/account"
+              aria-label="Account"
+              className="hidden h-11 w-11 items-center justify-center sm:flex"
+            >
               <UserIcon />
             </Link>
             <button
               type="button"
               onClick={openCart}
               aria-label="Open bag"
-              className="relative"
+              className="relative flex h-11 w-11 items-center justify-center"
             >
               <BagIcon />
               {cartCount > 0 ? (
-                <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] text-ink">
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] text-ink">
                   {cartCount}
                 </span>
               ) : null}
@@ -142,38 +146,53 @@ export function SiteHeader() {
       </div>
 
       {isMenuOpen ? (
-        <div className="fixed inset-0 z-50 bg-ivory lg:hidden">
-          <div className="flex items-center justify-between border-b border-line px-4 py-4">
-            <span className="font-serif text-2xl tracking-[0.28em]">SKYVANO</span>
-            <button type="button" onClick={closeMenu} aria-label="Close menu">
+        <div className="fixed inset-0 z-50 flex h-dvh flex-col bg-ivory pt-[env(safe-area-inset-top)] lg:hidden">
+          <div className="flex items-center justify-between border-b border-line px-3 py-2">
+            <span className="font-serif text-xl tracking-[0.24em] sm:text-2xl">
+              SKYVANO
+            </span>
+            <button
+              type="button"
+              className="flex h-11 w-11 items-center justify-center"
+              onClick={closeMenu}
+              aria-label="Close menu"
+            >
               <CloseIcon />
             </button>
           </div>
-          <nav className="flex flex-col gap-6 px-6 py-10">
+          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-5 py-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
             {nav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={closeMenu}
-                className="font-serif text-4xl tracking-wide"
+                className={`py-2 font-serif text-3xl tracking-wide sm:text-4xl ${
+                  item.label === "Sale" ? "text-gold" : ""
+                }`}
               >
                 {item.label}
               </Link>
             ))}
-            <Link
-              href="/about"
-              onClick={closeMenu}
-              className="pt-4 text-sm uppercase tracking-[0.2em] text-muted"
-            >
-              About
-            </Link>
-            <Link
-              href="/contact"
-              onClick={closeMenu}
-              className="text-sm uppercase tracking-[0.2em] text-muted"
-            >
-              Contact
-            </Link>
+            <div className="mt-6 grid gap-3 border-t border-line pt-6 text-sm uppercase tracking-[0.2em] text-muted">
+              <Link href="/account" onClick={closeMenu} className="py-1">
+                Account
+              </Link>
+              <Link href="/about" onClick={closeMenu} className="py-1">
+                About
+              </Link>
+              <Link href="/contact" onClick={closeMenu} className="py-1">
+                Contact
+              </Link>
+              <Link href="/faq" onClick={closeMenu} className="py-1">
+                FAQ
+              </Link>
+              <Link href="/shipping" onClick={closeMenu} className="py-1">
+                Shipping
+              </Link>
+              <Link href="/returns" onClick={closeMenu} className="py-1">
+                Returns
+              </Link>
+            </div>
           </nav>
         </div>
       ) : null}

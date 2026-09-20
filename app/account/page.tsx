@@ -32,22 +32,22 @@ export default function AccountPage() {
             <input
               required
               placeholder="Full name"
-              className="border border-line bg-white px-4 py-3"
+              className="min-h-11 border border-line bg-white px-4 py-3 text-base"
             />
           ) : null}
           <input
             type="email"
             required
             placeholder="Email"
-            className="border border-line bg-white px-4 py-3"
+            className="min-h-11 border border-line bg-white px-4 py-3 text-base"
           />
           <input
             type="password"
             required
             placeholder="Password"
-            className="border border-line bg-white px-4 py-3"
+            className="min-h-11 border border-line bg-white px-4 py-3 text-base"
           />
-          <Button type="submit">
+          <Button type="submit" className="w-full">
             {mode === "login" ? "Sign in" : "Create account"}
           </Button>
         </form>

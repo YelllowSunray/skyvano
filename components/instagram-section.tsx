@@ -5,13 +5,13 @@ import { instagramImages } from "@/lib/products";
 export function InstagramSection() {
   return (
     <section className="pb-8">
-      <div className="mb-8 text-center">
+      <div className="mb-6 px-4 text-center sm:mb-8">
         <p className="text-[11px] uppercase tracking-[0.28em] text-gold">
           Follow @skyvano
         </p>
-        <h2 className="mt-2 font-serif text-4xl">The edit, in motion</h2>
+        <h2 className="mt-2 font-serif text-3xl sm:text-4xl">The edit, in motion</h2>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6">
         {instagramImages.map((src, index) => (
           <a
             key={src}
@@ -25,7 +25,7 @@ export function InstagramSection() {
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(min-width: 768px) 16vw, 50vw"
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-ink/0 text-white opacity-0 transition-all group-hover:bg-ink/35 group-hover:opacity-100">
+            <div className="absolute inset-0 flex items-center justify-center bg-ink/0 text-white opacity-0 transition-all group-hover:bg-ink/35 group-hover:opacity-100 group-active:bg-ink/35 group-active:opacity-100">
               <InstagramIcon className="h-6 w-6" />
             </div>
           </a>

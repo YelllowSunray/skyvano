@@ -25,17 +25,19 @@ const reasons = [
 
 export function WhyShop() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-20 md:px-8">
-      <div className="mb-12 text-center">
+    <section className="mx-auto max-w-7xl px-4 py-12 sm:py-16 md:px-8 md:py-20">
+      <div className="mb-8 text-center sm:mb-12">
         <p className="text-[11px] uppercase tracking-[0.28em] text-gold">
           The Skyvano standard
         </p>
-        <h2 className="mt-2 font-serif text-4xl md:text-5xl">Why shop with us</h2>
+        <h2 className="mt-2 font-serif text-3xl sm:text-4xl md:text-5xl">
+          Why shop with us
+        </h2>
       </div>
-      <div className="grid gap-8 md:grid-cols-5">
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
         {reasons.map((reason) => (
-          <div key={reason.title} className="text-center md:text-left">
-            <div className="mx-auto mb-4 flex h-9 w-9 items-center justify-center rounded-full border border-gold text-gold md:mx-0">
+          <div key={reason.title} className="text-center sm:text-left">
+            <div className="mx-auto mb-4 flex h-9 w-9 items-center justify-center rounded-full border border-gold text-gold sm:mx-0">
               <CheckIcon />
             </div>
             <h3 className="font-serif text-2xl">{reason.title}</h3>

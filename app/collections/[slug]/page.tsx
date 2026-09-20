@@ -36,7 +36,7 @@ export default async function CollectionPage({
   const items = getProductsByCollection(slug);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 pb-20 md:px-8">
+    <div className="mx-auto max-w-7xl px-4 pb-16 md:px-8 md:pb-20">
       <PageIntro eyebrow="Collection" title={collection.title}>
         {collection.description}
       </PageIntro>

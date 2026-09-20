@@ -47,9 +47,9 @@ export default function FaqPage() {
         {faqs.map((item) => (
           <details
             key={item.q}
-            className="group border border-line bg-white px-5 py-4"
+            className="group border border-line bg-white px-4 py-3 sm:px-5 sm:py-4"
           >
-            <summary className="cursor-pointer list-none font-serif text-2xl">
+            <summary className="cursor-pointer list-none py-1 font-serif text-xl leading-snug sm:text-2xl">
               {item.q}
             </summary>
             <p className="mt-3 text-sm leading-7 text-muted">{item.a}</p>

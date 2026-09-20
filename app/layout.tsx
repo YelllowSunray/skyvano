@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
 import { CartDrawer } from "@/components/cart-drawer";
 import { SearchModal } from "@/components/search-modal";
@@ -29,13 +29,19 @@ export const metadata: Metadata = {
     "Skyvano is a curated luxury boutique for designer clothing and accessories for women and men.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
       className={`${outfit.variable} ${cormorant.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-cream font-sans text-ink">
+      <body className="flex min-h-dvh flex-col overflow-x-clip bg-cream font-sans text-ink">
         <StoreProvider>
           <SiteHeader />
           <main className="flex-1">{children}</main>

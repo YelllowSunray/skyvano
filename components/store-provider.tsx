@@ -82,6 +82,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return () => window.clearTimeout(timeout);
   }, [toast]);
 
+  useEffect(() => {
+    const locked = isCartOpen || isSearchOpen || isMenuOpen;
+    document.body.style.overflow = locked ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isCartOpen, isMenuOpen, isSearchOpen]);
+
   const addToCart = useCallback(
     ({
       product,
@@ -156,11 +164,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       isSearchOpen,
       isMenuOpen,
       toast,
-      openCart: () => setIsCartOpen(true),
+      openCart: () => {
+        setIsMenuOpen(false);
+        setIsSearchOpen(false);
+        setIsCartOpen(true);
+      },
       closeCart: () => setIsCartOpen(false),
-      openSearch: () => setIsSearchOpen(true),
+      openSearch: () => {
+        setIsMenuOpen(false);
+        setIsCartOpen(false);
+        setIsSearchOpen(true);
+      },
       closeSearch: () => setIsSearchOpen(false),
-      openMenu: () => setIsMenuOpen(true),
+      openMenu: () => {
+        setIsSearchOpen(false);
+        setIsCartOpen(false);
+        setIsMenuOpen(true);
+      },
       closeMenu: () => setIsMenuOpen(false),
       addToCart,
       updateQuantity,

@@ -15,12 +15,12 @@ export default function CartPage() {
 
   if (placed) {
     return (
-      <div className="mx-auto max-w-xl px-4 py-24 text-center">
+      <div className="mx-auto max-w-xl px-4 py-16 text-center sm:py-24">
         <p className="text-[11px] uppercase tracking-[0.28em] text-gold">
           Order received
         </p>
-        <h1 className="mt-3 font-serif text-5xl">Thank you</h1>
-        <p className="mt-4 text-muted">
+        <h1 className="mt-3 font-serif text-4xl sm:text-5xl">Thank you</h1>
+        <p className="mt-4 text-sm text-muted sm:text-base">
           This is a demonstration checkout. In production, this step connects to
           Shopify payments.
         </p>
@@ -32,7 +32,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 pb-24 md:px-8">
+    <div className="mx-auto max-w-5xl px-4 pb-20 md:px-8 md:pb-24">
       <PageIntro eyebrow="Bag" title="Your bag">
         {cart.length === 0
           ? "Nothing here yet."
@@ -43,50 +43,50 @@ export default function CartPage() {
           <Button href="/collections/women">Shop the edit</Button>
         </div>
       ) : (
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_0.8fr]">
+        <div className="grid gap-10 lg:grid-cols-[1.4fr_0.8fr] lg:gap-12">
           <ul>
             {cart.map((item) => (
               <li
                 key={item.key}
-                className="flex gap-4 border-b border-line py-6"
+                className="flex gap-3 border-b border-line py-5 sm:gap-4 sm:py-6"
               >
-                <Link href={`/products/${item.slug}`}>
+                <Link href={`/products/${item.slug}`} className="shrink-0">
                   <Image
                     src={item.image}
                     alt={item.name}
                     width={120}
                     height={150}
-                    className="h-[150px] w-[120px] object-cover"
+                    className="h-24 w-20 object-cover sm:h-[150px] sm:w-[120px]"
                   />
                 </Link>
-                <div className="flex-1">
+                <div className="min-w-0 flex-1">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-muted">
                     {item.brand}
                   </p>
                   <Link
                     href={`/products/${item.slug}`}
-                    className="font-serif text-2xl"
+                    className="font-serif text-xl leading-tight sm:text-2xl"
                   >
                     {item.name}
                   </Link>
                   <p className="mt-1 text-sm text-muted">
                     {item.color} / {item.size}
                   </p>
-                  <div className="mt-4 flex items-center justify-between">
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-3 sm:mt-4">
                     <div className="flex items-center border border-line">
                       <button
                         type="button"
-                        className="px-3 py-1"
+                        className="flex h-10 w-10 items-center justify-center"
                         onClick={() =>
                           updateQuantity(item.key, item.quantity - 1)
                         }
                       >
                         −
                       </button>
-                      <span className="px-3">{item.quantity}</span>
+                      <span className="min-w-6 text-center">{item.quantity}</span>
                       <button
                         type="button"
-                        className="px-3 py-1"
+                        className="flex h-10 w-10 items-center justify-center"
                         onClick={() =>
                           updateQuantity(item.key, item.quantity + 1)
                         }
@@ -94,11 +94,13 @@ export default function CartPage() {
                         +
                       </button>
                     </div>
-                    <p>{formatPrice(item.price * item.quantity)}</p>
+                    <p className="text-sm sm:text-base">
+                      {formatPrice(item.price * item.quantity)}
+                    </p>
                   </div>
                   <button
                     type="button"
-                    className="mt-3 text-[11px] uppercase tracking-[0.16em] underline"
+                    className="mt-2 min-h-10 text-[11px] uppercase tracking-[0.16em] underline"
                     onClick={() => removeFromCart(item.key)}
                   >
                     Remove
@@ -107,7 +109,7 @@ export default function CartPage() {
               </li>
             ))}
           </ul>
-          <aside className="h-fit border border-line bg-white p-6">
+          <aside className="h-fit border border-line bg-white p-5 sm:p-6">
             <h2 className="font-serif text-3xl">Summary</h2>
             <div className="mt-6 flex justify-between text-sm">
               <span>Subtotal</span>

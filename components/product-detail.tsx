@@ -19,8 +19,16 @@ export function ProductDetail({ product }: { product: Product }) {
     return product.compareAtPrice - product.price;
   }, [product]);
 
+  const add = () => {
+    if (!size) {
+      setError("Please select a size.");
+      return;
+    }
+    addToCart({ product, color, size });
+  };
+
   return (
-    <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-2 md:px-8 lg:gap-16">
+    <div className="mx-auto grid max-w-7xl gap-8 px-4 py-6 sm:gap-10 sm:py-12 md:grid-cols-2 md:px-8 lg:gap-16">
       <div>
         <div className="relative aspect-[4/5] overflow-hidden bg-white">
           <Image
@@ -32,7 +40,7 @@ export function ProductDetail({ product }: { product: Product }) {
             sizes="(min-width: 768px) 50vw, 100vw"
           />
         </div>
-        <div className="mt-3 grid grid-cols-4 gap-3">
+        <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">
           {product.images.map((image, index) => (
             <button
               key={image}
@@ -48,11 +56,13 @@ export function ProductDetail({ product }: { product: Product }) {
         </div>
       </div>
 
-      <div className="pt-2">
+      <div className="pt-1 pb-24 md:pb-2">
         <p className="text-[11px] uppercase tracking-[0.24em] text-gold">
           {product.brand}
         </p>
-        <h1 className="mt-2 font-serif text-5xl">{product.name}</h1>
+        <h1 className="mt-2 font-serif text-3xl leading-tight sm:text-4xl md:text-5xl">
+          {product.name}
+        </h1>
         <p className="mt-4 text-lg">
           {product.compareAtPrice ? (
             <>
@@ -71,7 +81,9 @@ export function ProductDetail({ product }: { product: Product }) {
           </p>
         ) : null}
 
-        <p className="mt-6 max-w-md leading-7 text-muted">{product.description}</p>
+        <p className="mt-5 max-w-md text-sm leading-7 text-muted sm:mt-6 sm:text-base">
+          {product.description}
+        </p>
 
         <fieldset className="mt-8">
           <legend className="text-[11px] uppercase tracking-[0.2em]">
@@ -84,7 +96,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 type="button"
                 aria-label={option.name}
                 onClick={() => setColor(option.name)}
-                className={`h-7 w-7 rounded-full border ${
+                className={`h-9 w-9 rounded-full border sm:h-7 sm:w-7 ${
                   color === option.name ? "border-ink p-0.5" : "border-line"
                 }`}
               >
@@ -108,7 +120,7 @@ export function ProductDetail({ product }: { product: Product }) {
                   setSize(option);
                   setError("");
                 }}
-                className={`min-w-12 border px-3 py-2 text-sm ${
+                className={`min-h-11 min-w-11 border px-3 py-2 text-sm ${
                   size === option
                     ? "border-ink bg-ink text-white"
                     : "border-line hover:border-ink"
@@ -122,17 +134,8 @@ export function ProductDetail({ product }: { product: Product }) {
 
         {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
 
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button
-            className="flex-1"
-            onClick={() => {
-              if (!size) {
-                setError("Please select a size.");
-                return;
-              }
-              addToCart({ product, color, size });
-            }}
-          >
+        <div className="mt-8 hidden flex-col gap-3 sm:flex-row md:flex">
+          <Button className="flex-1" onClick={add}>
             Add to bag
           </Button>
           <Button href="/shipping" variant="outline" className="flex-1">
@@ -145,6 +148,20 @@ export function ProductDetail({ product }: { product: Product }) {
             <li key={detail}>— {detail}</li>
           ))}
         </ul>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ivory/95 px-4 py-3 backdrop-blur md:hidden pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="flex items-center gap-3">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm">{formatPrice(product.price)}</p>
+            <p className="truncate text-[11px] text-muted">
+              {color} / {size}
+            </p>
+          </div>
+          <Button className="shrink-0" onClick={add}>
+            Add to bag
+          </Button>
+        </div>
       </div>
     </div>
   );

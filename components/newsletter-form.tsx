@@ -32,7 +32,7 @@ export function NewsletterForm({ dark = false }: NewsletterFormProps) {
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="Email address"
-            className={`min-w-0 flex-1 bg-transparent px-4 py-3 text-sm outline-none ${
+            className={`min-w-0 flex-1 bg-transparent px-3 py-3 text-base outline-none sm:px-4 ${
               dark
                 ? "placeholder:text-white/40"
                 : "placeholder:text-muted"
@@ -40,7 +40,7 @@ export function NewsletterForm({ dark = false }: NewsletterFormProps) {
           />
           <button
             type="submit"
-            className={`px-5 text-[11px] uppercase tracking-[0.2em] ${
+            className={`min-h-11 px-4 text-[11px] uppercase tracking-[0.16em] sm:px-5 sm:tracking-[0.2em] ${
               dark ? "bg-gold text-ink" : "bg-ink text-white"
             }`}
           >

@@ -47,7 +47,7 @@ export function ContactForm() {
           className="border border-line bg-white px-4 py-3 text-base normal-case tracking-normal"
         />
       </label>
-      <Button type="submit">Send message</Button>
+      <Button type="submit" className="w-full sm:w-auto">Send message</Button>
     </form>
   );
 }

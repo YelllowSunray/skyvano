@@ -13,7 +13,7 @@ export function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <article className="group">
+    <article className="group min-w-0">
       <div className="relative aspect-[4/5] overflow-hidden bg-white">
         <Link href={`/products/${product.slug}`} className="absolute inset-0 block">
           <Image
@@ -34,26 +34,26 @@ export function ProductCard({ product }: { product: Product }) {
           ) : null}
         </Link>
         {product.tags.includes("sale") ? (
-          <span className="absolute left-3 top-3 bg-ink px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-white">
+          <span className="absolute left-2 top-2 bg-ink px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-white sm:left-3 sm:top-3">
             Sale
           </span>
         ) : product.tags.includes("new") ? (
-          <span className="absolute left-3 top-3 bg-gold px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-ink">
+          <span className="absolute left-2 top-2 bg-gold px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-ink sm:left-3 sm:top-3">
             New
           </span>
         ) : null}
-        <div className="absolute inset-x-3 bottom-3 z-10 translate-y-3 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 max-md:translate-y-0 max-md:opacity-100">
+        <div className="absolute inset-x-2 bottom-2 z-10 sm:inset-x-3 sm:bottom-3 sm:translate-y-3 sm:opacity-0 sm:transition-all sm:duration-300 sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
           {open ? (
-            <div className="bg-ivory/95 p-3">
+            <div className="max-h-28 overflow-y-auto bg-ivory/95 p-2 sm:max-h-none sm:p-3">
               <p className="mb-2 text-[10px] uppercase tracking-[0.18em]">
                 Select size
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {product.sizes.map((size) => (
                   <button
                     key={size}
                     type="button"
-                    className="border border-ink px-2 py-1 text-[11px] uppercase tracking-[0.12em] hover:bg-ink hover:text-white"
+                    className="min-h-8 min-w-8 border border-ink px-2 py-1 text-[10px] uppercase tracking-[0.12em] hover:bg-ink hover:text-white sm:min-h-0 sm:text-[11px]"
                     onClick={() => {
                       addToCart({ product, color, size });
                       setOpen(false);
@@ -67,7 +67,7 @@ export function ProductCard({ product }: { product: Product }) {
           ) : (
             <button
               type="button"
-              className="w-full bg-ink py-3 text-[11px] uppercase tracking-[0.22em] text-white"
+              className="w-full bg-ink py-2 text-[10px] uppercase tracking-[0.16em] text-white sm:py-3 sm:text-[11px] sm:tracking-[0.22em]"
               onClick={() => setOpen(true)}
             >
               Quick add
@@ -75,13 +75,13 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </div>
       </div>
-      <div className="pt-4">
-        <p className="text-[11px] uppercase tracking-[0.2em] text-muted">
+      <div className="pt-3 sm:pt-4">
+        <p className="truncate text-[10px] uppercase tracking-[0.16em] text-muted sm:text-[11px] sm:tracking-[0.2em]">
           {product.brand}
         </p>
         <Link
           href={`/products/${product.slug}`}
-          className="mt-1 block font-serif text-xl leading-tight"
+          className="mt-1 block font-serif text-[17px] leading-snug sm:text-xl"
         >
           {product.name}
         </Link>
@@ -97,14 +97,14 @@ export function ProductCard({ product }: { product: Product }) {
             formatPrice(product.price)
           )}
         </p>
-        <div className="mt-3 flex gap-2">
+        <div className="mt-2 flex flex-wrap gap-2 sm:mt-3">
           {product.colors.map((option) => (
             <button
               key={option.name}
               type="button"
               aria-label={option.name}
               onClick={() => setColor(option.name)}
-              className={`h-3.5 w-3.5 rounded-full border ${
+              className={`h-5 w-5 rounded-full border sm:h-3.5 sm:w-3.5 ${
                 color === option.name ? "border-ink" : "border-transparent"
               }`}
               style={{ backgroundColor: option.hex }}

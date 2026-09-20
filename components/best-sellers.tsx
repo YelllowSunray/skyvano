@@ -9,24 +9,26 @@ export function BestSellers() {
   const items = products.filter((product) => product.tags.includes("bestseller"));
 
   const scroll = (direction: number) => {
-    scroller.current?.scrollBy({ left: direction * 320, behavior: "smooth" });
+    scroller.current?.scrollBy({ left: direction * 280, behavior: "smooth" });
   };
 
   return (
-    <section className="bg-white py-20">
+    <section className="bg-white py-12 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
-        <div className="mb-10 flex items-end justify-between">
+        <div className="mb-8 flex items-end justify-between gap-4 sm:mb-10">
           <div>
             <p className="text-[11px] uppercase tracking-[0.28em] text-gold">
               Most requested
             </p>
-            <h2 className="mt-2 font-serif text-4xl md:text-5xl">Best sellers</h2>
+            <h2 className="mt-2 font-serif text-3xl sm:text-4xl md:text-5xl">
+              Best sellers
+            </h2>
           </div>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={() => scroll(-1)}
-              className="h-10 w-10 border border-ink"
+              className="flex h-11 w-11 items-center justify-center border border-ink"
               aria-label="Previous"
             >
               ←
@@ -34,7 +36,7 @@ export function BestSellers() {
             <button
               type="button"
               onClick={() => scroll(1)}
-              className="h-10 w-10 border border-ink"
+              className="flex h-11 w-11 items-center justify-center border border-ink"
               aria-label="Next"
             >
               →
@@ -43,10 +45,13 @@ export function BestSellers() {
         </div>
         <div
           ref={scroller}
-          className="no-scrollbar flex snap-x gap-5 overflow-x-auto"
+          className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 touch-pan-x md:mx-0 md:px-0"
         >
           {items.map((product) => (
-            <div key={product.id} className="w-[260px] shrink-0 snap-start md:w-[300px]">
+            <div
+              key={product.id}
+              className="w-[72vw] max-w-[280px] shrink-0 snap-start sm:w-[260px] md:w-[300px] md:max-w-none"
+            >
               <ProductCard product={product} />
             </div>
           ))}
