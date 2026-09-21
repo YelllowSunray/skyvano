@@ -13,6 +13,8 @@ import type { Product } from "@/lib/products";
 export type CartItem = {
   key: string;
   productId: string;
+  /** Shopify variant GID, needed when we hand the bag over to checkout. */
+  variantId?: string;
   slug: string;
   name: string;
   brand: string;
@@ -102,6 +104,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       size: string;
       quantity?: number;
     }) => {
+      const variant = product.variants.find(
+        (option) => option.color === color && option.size === size,
+      );
       const key = `${product.id}-${color}-${size}`;
       setCart((current) => {
         const existing = current.find((item) => item.key === key);
@@ -117,11 +122,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           {
             key,
             productId: product.id,
+            variantId: variant?.id,
             slug: product.slug,
             name: product.name,
             brand: product.brand,
             image: product.images[0],
-            price: product.price,
+            price: variant?.price ?? product.price,
             color,
             size,
             quantity,

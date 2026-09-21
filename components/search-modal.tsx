@@ -3,18 +3,44 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import type { SearchHit } from "@/app/api/search/route";
 import { CloseIcon, SearchIcon } from "@/components/icons";
 import { useStore } from "@/components/store-provider";
 import { formatPrice } from "@/lib/format";
-import { searchProducts } from "@/lib/products";
 
 export function SearchModal() {
   const { isSearchOpen, closeSearch } = useStore();
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchHit[]>([]);
 
-  const results = useMemo(() => searchProducts(query).slice(0, 6), [query]);
+  useEffect(() => {
+    const term = query.trim();
+    if (!term) {
+      setResults([]);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(async () => {
+      try {
+        const response = await fetch(`/api/search?q=${encodeURIComponent(term)}`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+        const data = (await response.json()) as { results: SearchHit[] };
+        setResults(data.results);
+      } catch {
+        // Aborted or offline — keep whatever is on screen.
+      }
+    }, 200);
+
+    return () => {
+      controller.abort();
+      window.clearTimeout(timeout);
+    };
+  }, [query]);
 
   if (!isSearchOpen) return null;
 
@@ -61,13 +87,15 @@ export function SearchModal() {
                 onClick={closeSearch}
                 className="flex items-center gap-3 py-1 hover:bg-white/60 sm:gap-4"
               >
-                <Image
-                  src={product.images[0]}
-                  alt={product.name}
-                  width={72}
-                  height={90}
-                  className="h-[72px] w-[58px] shrink-0 object-cover sm:h-[90px] sm:w-[72px]"
-                />
+                {product.image ? (
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    width={72}
+                    height={90}
+                    className="h-[72px] w-[58px] shrink-0 object-cover sm:h-[90px] sm:w-[72px]"
+                  />
+                ) : null}
                 <div className="min-w-0">
                   <p className="text-[11px] uppercase tracking-[0.18em] text-muted">
                     {product.brand}

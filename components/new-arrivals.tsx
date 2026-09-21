@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { ProductCard } from "@/components/product-card";
-import { products } from "@/lib/products";
+import { getNewArrivals } from "@/lib/catalog";
 
-export function NewArrivals() {
-  const items = products.filter((product) => product.tags.includes("new")).slice(0, 8);
+export async function NewArrivals() {
+  const items = await getNewArrivals(8);
+  if (items.length === 0) return null;
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-8 md:px-8">

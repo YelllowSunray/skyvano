@@ -6,14 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "shopify": "shopify",
+    "shopify:check": "node scripts/shopify-check.mjs",
+    "shopify:deploy": "shopify app deploy --path shopify-app/skyvano-api --allow-updates"
   },
   "dependencies": {
     "next": "16.3.5",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@shopify/cli": "^4.8.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

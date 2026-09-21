@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageIntro } from "@/components/page-intro";
 import { ProductGrid } from "@/components/product-grid";
-import { searchProducts } from "@/lib/products";
+import { searchProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Search",
@@ -13,7 +13,7 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q = "" } = await searchParams;
-  const results = searchProducts(q);
+  const results = await searchProducts(q);
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-20 md:px-8">

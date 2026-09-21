@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Shopify CLI app scaffold, linted by its own tooling.
+    "shopify-app/**",
   ]),
 ]);
 

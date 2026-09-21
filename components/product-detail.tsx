@@ -10,14 +10,42 @@ import type { Product } from "@/lib/products";
 export function ProductDetail({ product }: { product: Product }) {
   const { addToCart } = useStore();
   const [activeImage, setActiveImage] = useState(0);
-  const [color, setColor] = useState(product.colors[0].name);
-  const [size, setSize] = useState(product.sizes[0]);
+  const [color, setColor] = useState(product.colors[0]?.name ?? "");
+  const [size, setSize] = useState(
+    product.sizes.length === 1 ? product.sizes[0] : "",
+  );
   const [error, setError] = useState("");
 
-  const savings = useMemo(() => {
-    if (!product.compareAtPrice) return null;
-    return product.compareAtPrice - product.price;
-  }, [product]);
+  // Sizes belong to a colour, so the option list follows the current swatch.
+  const sizeOptions = useMemo(() => {
+    const matches = product.variants.filter(
+      (variant) => !color || variant.color === color,
+    );
+    const source = matches.length > 0 ? matches : product.variants;
+    return [...new Map(source.map((variant) => [variant.size, variant])).values()];
+  }, [color, product.variants]);
+
+  const selected = useMemo(
+    () =>
+      product.variants.find(
+        (variant) =>
+          variant.size === size && (!color || variant.color === color),
+      ),
+    [color, product.variants, size],
+  );
+
+  const price = selected?.price ?? product.price;
+  const compareAtPrice = selected?.compareAtPrice ?? product.compareAtPrice;
+  const savings = compareAtPrice ? compareAtPrice - price : null;
+
+  const selectColor = (next: string) => {
+    setColor(next);
+    const sizesForColor = product.variants
+      .filter((variant) => variant.color === next)
+      .map((variant) => variant.size);
+    if (sizesForColor.length === 1) setSize(sizesForColor[0]);
+    else if (!sizesForColor.includes(size)) setSize("");
+  };
 
   const add = () => {
     if (!size) {
@@ -64,15 +92,15 @@ export function ProductDetail({ product }: { product: Product }) {
           {product.name}
         </h1>
         <p className="mt-4 text-lg">
-          {product.compareAtPrice ? (
+          {compareAtPrice ? (
             <>
               <span className="mr-3 text-muted line-through">
-                {formatPrice(product.compareAtPrice)}
+                {formatPrice(compareAtPrice)}
               </span>
-              {formatPrice(product.price)}
+              {formatPrice(price)}
             </>
           ) : (
-            formatPrice(product.price)
+            formatPrice(price)
           )}
         </p>
         {savings ? (
@@ -85,48 +113,51 @@ export function ProductDetail({ product }: { product: Product }) {
           {product.description}
         </p>
 
-        <fieldset className="mt-8">
-          <legend className="text-[11px] uppercase tracking-[0.2em]">
-            Colour — {color}
-          </legend>
-          <div className="mt-3 flex gap-3">
-            {product.colors.map((option) => (
-              <button
-                key={option.name}
-                type="button"
-                aria-label={option.name}
-                onClick={() => setColor(option.name)}
-                className={`h-9 w-9 rounded-full border sm:h-7 sm:w-7 ${
-                  color === option.name ? "border-ink p-0.5" : "border-line"
-                }`}
-              >
-                <span
-                  className="block h-full w-full rounded-full"
-                  style={{ backgroundColor: option.hex }}
-                />
-              </button>
-            ))}
-          </div>
-        </fieldset>
+        {product.colors.length > 0 ? (
+          <fieldset className="mt-8">
+            <legend className="text-[11px] uppercase tracking-[0.2em]">
+              Colour — {color}
+            </legend>
+            <div className="mt-3 flex gap-3">
+              {product.colors.map((option) => (
+                <button
+                  key={option.name}
+                  type="button"
+                  aria-label={option.name}
+                  onClick={() => selectColor(option.name)}
+                  className={`h-9 w-9 rounded-full border sm:h-7 sm:w-7 ${
+                    color === option.name ? "border-ink p-0.5" : "border-line"
+                  }`}
+                >
+                  <span
+                    className="block h-full w-full rounded-full"
+                    style={{ backgroundColor: option.hex }}
+                  />
+                </button>
+              ))}
+            </div>
+          </fieldset>
+        ) : null}
 
         <fieldset className="mt-8">
           <legend className="text-[11px] uppercase tracking-[0.2em]">Size</legend>
           <div className="mt-3 flex flex-wrap gap-2">
-            {product.sizes.map((option) => (
+            {sizeOptions.map((option) => (
               <button
-                key={option}
+                key={option.size}
                 type="button"
+                disabled={!option.available}
                 onClick={() => {
-                  setSize(option);
+                  setSize(option.size);
                   setError("");
                 }}
-                className={`min-h-11 min-w-11 border px-3 py-2 text-sm ${
-                  size === option
+                className={`min-h-11 min-w-11 border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:border-line disabled:text-muted/50 disabled:line-through ${
+                  size === option.size
                     ? "border-ink bg-ink text-white"
                     : "border-line hover:border-ink"
                 }`}
               >
-                {option}
+                {option.size}
               </button>
             ))}
           </div>
@@ -153,9 +184,9 @@ export function ProductDetail({ product }: { product: Product }) {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-ivory/95 px-4 py-3 backdrop-blur md:hidden pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm">{formatPrice(product.price)}</p>
+            <p className="truncate text-sm">{formatPrice(price)}</p>
             <p className="truncate text-[11px] text-muted">
-              {color} / {size}
+              {[color, size].filter(Boolean).join(" / ") || "Select a size"}
             </p>
           </div>
           <Button className="shrink-0" onClick={add}>

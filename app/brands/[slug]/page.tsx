@@ -2,15 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageIntro } from "@/components/page-intro";
 import { ProductGrid } from "@/components/product-grid";
-import {
-  brandToSlug,
-  getBrand,
-  getProductsByBrand,
-  houses,
-} from "@/lib/products";
+import { getBrandBySlug, getBrands, getProductsByBrand } from "@/lib/catalog";
 
-export function generateStaticParams() {
-  return houses.map((house) => ({ slug: brandToSlug(house) }));
+export async function generateStaticParams() {
+  const brands = await getBrands();
+  return brands.map((brand) => ({ slug: brand.slug }));
 }
 
 export async function generateMetadata({
@@ -19,11 +15,11 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const brand = getBrand(slug);
+  const brand = await getBrandBySlug(slug);
   return {
-    title: brand ?? "Brand",
+    title: brand?.name ?? "Brand",
     description: brand
-      ? `Shop ${brand} at Skyvano.`
+      ? `Shop ${brand.name} at Skyvano.`
       : "Designer pieces at Skyvano.",
   };
 }
@@ -34,13 +30,13 @@ export default async function BrandPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const brand = getBrand(slug);
+  const brand = await getBrandBySlug(slug);
   if (!brand) notFound();
-  const items = getProductsByBrand(brand);
+  const items = await getProductsByBrand(brand.name);
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-16 md:px-8 md:pb-20">
-      <PageIntro eyebrow="Brand" title={brand}>
+      <PageIntro eyebrow="Brand" title={brand.name}>
         {items.length} {items.length === 1 ? "piece" : "pieces"} in the Skyvano
         edit.
       </PageIntro>

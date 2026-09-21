@@ -7,7 +7,11 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { StoreProvider } from "@/components/store-provider";
 import { Toast } from "@/components/toast";
+import { getBrands } from "@/lib/catalog";
 import "./globals.css";
+
+// Keep in sync with CATALOG_REVALIDATE_SECONDS; Next requires a literal here.
+export const revalidate = 900;
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -44,7 +48,9 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const brands = await getBrands();
+
   return (
     <html
       lang="en"
@@ -54,7 +60,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-dvh flex-col overflow-x-clip bg-cream font-sans text-ink">
         <StoreProvider>
           <ClientCleanup />
-          <SiteHeader />
+          <SiteHeader brands={brands} />
           <main className="flex-1">{children}</main>
           <SiteFooter />
           <CartDrawer />

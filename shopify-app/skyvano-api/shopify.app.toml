@@ -1,0 +1,18 @@
+# Learn more: https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "6e832999af800aabd775ec85ac952008"
+name = "Skyvano API"
+application_url = "https://shopify.dev/apps/default-app-home"
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = false
+
+[webhooks]
+api_version = "2026-07"
+
+[access_scopes]
+scopes = "read_products,read_inventory,read_locations,read_orders,read_customers"
+
+[auth]
+redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]

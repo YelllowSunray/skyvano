@@ -11,7 +11,7 @@ import {
 } from "@/components/icons";
 import { useStore } from "@/components/store-provider";
 import { NavbarBackButton } from "@/components/smart-back";
-import { brandToSlug, houses } from "@/lib/products";
+import type { Brand } from "@/lib/catalog";
 
 const leftNav = [
   { href: "/collections/new-arrivals", label: "New Arrivals" },
@@ -34,7 +34,7 @@ const messages = [
   "Easy returns within 30 days",
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ brands }: { brands: Brand[] }) {
   const {
     cartCount,
     openCart,
@@ -75,7 +75,7 @@ export function SiteHeader() {
             >
               <MenuIcon />
             </button>
-            <nav className="hidden items-center gap-5 text-[11px] uppercase tracking-[0.22em] xl:gap-6 lg:flex">
+            <nav className="hidden items-center gap-4 whitespace-nowrap text-[11px] uppercase tracking-[0.18em] xl:gap-6 xl:tracking-[0.22em] lg:flex">
               {leftNav.map((item) => (
                 <Link
                   key={item.href}
@@ -109,7 +109,7 @@ export function SiteHeader() {
           </Link>
 
           <div className="flex items-center justify-end gap-0.5 sm:gap-2">
-            <nav className="mr-1 hidden items-center gap-5 text-[11px] uppercase tracking-[0.22em] xl:mr-2 xl:gap-6 lg:flex">
+            <nav className="mr-1 hidden items-center gap-4 whitespace-nowrap text-[11px] uppercase tracking-[0.18em] xl:mr-2 xl:gap-6 xl:tracking-[0.22em] lg:flex">
               {rightNav.map((item) =>
                 item.label === "Brands" ? (
                   <div key={item.href} className="group relative">
@@ -119,19 +119,21 @@ export function SiteHeader() {
                     >
                       {item.label}
                     </Link>
-                    <div className="invisible absolute left-0 top-full z-50 min-w-52 border border-line bg-ivory py-3 opacity-0 shadow-sm transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                      {houses.map((house) => (
-                        <Link
-                          key={house}
-                          href={`/brands/${brandToSlug(house)}`}
-                          className="block px-5 py-2 text-[11px] tracking-[0.18em] text-ink/80 hover:text-gold"
-                        >
-                          {house}
-                        </Link>
-                      ))}
+                    <div className="invisible absolute left-0 top-full z-50 flex max-h-[70vh] min-w-52 flex-col border border-line bg-ivory opacity-0 shadow-sm transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+                      <div className="overflow-y-auto py-3">
+                        {brands.map((brand) => (
+                          <Link
+                            key={brand.slug}
+                            href={`/brands/${brand.slug}`}
+                            className="block whitespace-nowrap px-5 py-2 text-[11px] tracking-[0.18em] text-ink/80 hover:text-gold"
+                          >
+                            {brand.name}
+                          </Link>
+                        ))}
+                      </div>
                       <Link
                         href="/brands"
-                        className="mt-1 block border-t border-line px-5 pt-3 text-[11px] tracking-[0.18em] text-gold"
+                        className="border-t border-line bg-ivory px-5 py-3 text-[11px] tracking-[0.18em] text-gold"
                       >
                         Shop all brands
                       </Link>
@@ -211,14 +213,14 @@ export function SiteHeader() {
               </Link>
             ))}
             <div className="mt-4 grid gap-1 pb-2">
-              {houses.map((house) => (
+              {brands.map((brand) => (
                 <Link
-                  key={house}
-                  href={`/brands/${brandToSlug(house)}`}
+                  key={brand.slug}
+                  href={`/brands/${brand.slug}`}
                   onClick={closeMenu}
                   className="py-1.5 text-sm uppercase tracking-[0.18em] text-muted"
                 >
-                  {house}
+                  {brand.name}
                 </Link>
               ))}
             </div>

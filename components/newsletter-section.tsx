@@ -2,7 +2,7 @@ import { NewsletterForm } from "@/components/newsletter-form";
 
 export function NewsletterSection() {
   return (
-    <section className="border-y border-line bg-white px-4 py-12 text-center sm:py-16 md:py-20">
+    <section className="border-y border-line bg-ivory px-4 py-12 text-center sm:py-16 md:py-20">
       <p className="text-[11px] uppercase tracking-[0.28em] text-gold">
         Private access
       </p>

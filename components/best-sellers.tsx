@@ -3,18 +3,20 @@
 import Link from "next/link";
 import { useRef } from "react";
 import { ProductCard } from "@/components/product-card";
-import { products } from "@/lib/products";
+import type { Product } from "@/lib/products";
 
-export function BestSellers() {
+export function BestSellers({ products }: { products: Product[] }) {
   const scroller = useRef<HTMLDivElement>(null);
-  const items = products.filter((product) => product.tags.includes("bestseller"));
+  const items = products;
 
   const scroll = (direction: number) => {
     scroller.current?.scrollBy({ left: direction * 320, behavior: "smooth" });
   };
 
+  if (items.length === 0) return null;
+
   return (
-    <section className="bg-white py-12 sm:py-20">
+    <section className="border-y border-line bg-cream py-12 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <div className="mb-8 flex items-end justify-between gap-4 sm:mb-10">
           <div>

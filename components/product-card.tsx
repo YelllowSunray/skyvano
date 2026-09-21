@@ -9,8 +9,14 @@ import type { Product } from "@/lib/products";
 
 export function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useStore();
-  const [color, setColor] = useState(product.colors[0].name);
+  const [color, setColor] = useState(product.colors[0]?.name ?? "");
   const [open, setOpen] = useState(false);
+
+  // Sizes are per colour, so only offer the ones actually orderable.
+  const sizes = product.variants
+    .filter((variant) => variant.available && (!color || variant.color === color))
+    .map((variant) => variant.size);
+  const availableSizes = sizes.length > 0 ? [...new Set(sizes)] : product.sizes;
 
   return (
     <article className="group min-w-0">
@@ -49,7 +55,7 @@ export function ProductCard({ product }: { product: Product }) {
                 Select size
               </p>
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {product.sizes.map((size) => (
+                {availableSizes.map((size) => (
                   <button
                     key={size}
                     type="button"
