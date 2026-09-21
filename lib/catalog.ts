@@ -14,6 +14,7 @@ import {
   type MappedProduct,
   type ShopifyProductNode,
 } from "@/lib/shopify/map-product";
+import { fetchSellableVariantIds } from "@/lib/shopify/availability";
 import { ALL_PRODUCTS_QUERY, BEST_SELLING_QUERY } from "@/lib/shopify/queries";
 import { shopifyStorefrontGraphql } from "@/lib/shopify/storefront";
 import { buildSearchIndex, searchIndex, type SearchIndex } from "@/lib/search";
@@ -109,6 +110,30 @@ function buildBrands(products: Product[]): Brand[] {
   return [...brands.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
+/**
+ * Real per-variant availability, or null when the answer cannot be trusted.
+ *
+ * A store where nothing at all is sellable is a configuration fault — stock
+ * never imported, or a location that does not fulfil online orders — not 94
+ * products that genuinely sold out at once. Painting the entire storefront
+ * "Sold out" on that basis would hide a working catalogue, so the optimistic
+ * flags stand and the checkout guard still stops anyone paying for thin air.
+ */
+async function resolveSellableVariants(products: MappedProduct[]) {
+  const variantIds = products.flatMap((product) =>
+    product.variants.map((variant) => variant.id),
+  );
+  if (variantIds.length === 0) return null;
+
+  try {
+    const sellable = await fetchSellableVariantIds(variantIds, fetchOptions);
+    return sellable.size === 0 ? null : sellable;
+  } catch {
+    // Never let an availability probe take the whole catalogue down.
+    return null;
+  }
+}
+
 const loadCatalog = cache(async (): Promise<Catalog> => {
   if (!isShopifyReady()) {
     throw new Error(
@@ -129,12 +154,25 @@ const loadCatalog = cache(async (): Promise<Catalog> => {
     bestSellingHandles.map((handle, index) => [handle, index]),
   );
 
+  const sellable = await resolveSellableVariants(mapped);
+
   // Shopify already returned newest first, so position stands in for recency.
   const products: Product[] = mapped.map((product, index) => {
     const tags = [...product.tags];
     if (index < NEWEST_COUNT) tags.push("new");
     if (bestSellingRank.has(product.slug)) tags.push("bestseller");
-    return { ...product, tags };
+
+    const variants = product.variants.map((variant) => ({
+      ...variant,
+      available: sellable === null ? variant.available : sellable.has(variant.id),
+    }));
+
+    return {
+      ...product,
+      tags,
+      variants,
+      available: variants.some((variant) => variant.available),
+    };
   });
 
   const bySlug = new Map(products.map((product) => [product.slug, product]));

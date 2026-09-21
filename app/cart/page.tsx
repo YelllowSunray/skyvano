@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/button";
 import { PageIntro } from "@/components/page-intro";
+import { ShippingProgress } from "@/components/shipping-progress";
 import { useStore } from "@/components/store-provider";
 import { formatPrice } from "@/lib/format";
 
@@ -156,9 +157,11 @@ export default function CartPage() {
               <span>Subtotal</span>
               <span>{formatPrice(cartTotal)}</span>
             </div>
-            <p className="mt-3 text-xs leading-5 text-muted">
-              Shipping and tax are calculated at checkout. Delivery is
-              complimentary on orders over €150.
+            <div className="mt-4">
+              <ShippingProgress total={cartTotal} />
+            </div>
+            <p className="text-xs leading-5 text-muted">
+              Shipping and tax are calculated at checkout.
             </p>
             {error ? (
               <p

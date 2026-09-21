@@ -8,6 +8,7 @@ import { SiteHeader } from "@/components/site-header";
 import { StoreProvider } from "@/components/store-provider";
 import { Toast } from "@/components/toast";
 import { getBrands } from "@/lib/catalog";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 // Keep in sync with CATALOG_REVALIDATE_SECONDS; Next requires a literal here.
@@ -26,7 +27,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://skyvano.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Skyvano | Elevated style. Everyday luxury.",
     template: "%s | Skyvano",

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/button";
 import { CloseIcon } from "@/components/icons";
+import { ShippingProgress } from "@/components/shipping-progress";
 import { useStore } from "@/components/store-provider";
 import { formatPrice } from "@/lib/format";
 
@@ -130,6 +131,7 @@ export function CartDrawer() {
                   {formatPrice(cartTotal)}
                 </span>
               </div>
+              <ShippingProgress total={cartTotal} />
               <p className="mb-4 text-xs text-muted">
                 Shipping and tax calculated at checkout.
               </p>

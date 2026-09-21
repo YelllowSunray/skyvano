@@ -5,16 +5,26 @@ import { useMemo, useState } from "react";
 import { Button } from "@/components/button";
 import { useStore } from "@/components/store-provider";
 import { formatPrice } from "@/lib/format";
-import type { Product } from "@/lib/products";
+import type { Product, ProductVariant } from "@/lib/products";
+
+/** Preselects the size only when there is exactly one a shopper could buy. */
+function onlyAvailableSize(variants: ProductVariant[]) {
+  const sizes = [
+    ...new Set(
+      variants.filter((variant) => variant.available).map((variant) => variant.size),
+    ),
+  ];
+  return sizes.length === 1 ? sizes[0] : "";
+}
 
 export function ProductDetail({ product }: { product: Product }) {
   const { addToCart } = useStore();
   const [activeImage, setActiveImage] = useState(0);
   const [color, setColor] = useState(product.colors[0]?.name ?? "");
-  const [size, setSize] = useState(
-    product.sizes.length === 1 ? product.sizes[0] : "",
-  );
+  const [size, setSize] = useState(onlyAvailableSize(product.variants));
   const [error, setError] = useState("");
+
+  const soldOut = !product.variants.some((variant) => variant.available);
 
   // Sizes belong to a colour, so the option list follows the current swatch.
   const sizeOptions = useMemo(() => {
@@ -40,16 +50,22 @@ export function ProductDetail({ product }: { product: Product }) {
 
   const selectColor = (next: string) => {
     setColor(next);
-    const sizesForColor = product.variants
-      .filter((variant) => variant.color === next)
-      .map((variant) => variant.size);
-    if (sizesForColor.length === 1) setSize(sizesForColor[0]);
-    else if (!sizesForColor.includes(size)) setSize("");
+    setError("");
+    const forColour = product.variants.filter(
+      (variant) => variant.color === next,
+    );
+    const only = onlyAvailableSize(forColour);
+    if (only) setSize(only);
+    else if (!forColour.some((variant) => variant.size === size)) setSize("");
   };
 
   const add = () => {
     if (!size) {
       setError("Please select a size.");
+      return;
+    }
+    if (!selected?.available) {
+      setError("That size is sold out.");
       return;
     }
     addToCart({ product, color, size });
@@ -119,22 +135,30 @@ export function ProductDetail({ product }: { product: Product }) {
               Colour — {color}
             </legend>
             <div className="mt-3 flex gap-3">
-              {product.colors.map((option) => (
-                <button
-                  key={option.name}
-                  type="button"
-                  aria-label={option.name}
-                  onClick={() => selectColor(option.name)}
-                  className={`h-9 w-9 rounded-full border sm:h-7 sm:w-7 ${
-                    color === option.name ? "border-ink p-0.5" : "border-line"
-                  }`}
-                >
-                  <span
-                    className="block h-full w-full rounded-full"
-                    style={{ backgroundColor: option.hex }}
-                  />
-                </button>
-              ))}
+              {product.colors.map((option) => {
+                const unavailable = !product.variants.some(
+                  (variant) =>
+                    variant.color === option.name && variant.available,
+                );
+                return (
+                  <button
+                    key={option.name}
+                    type="button"
+                    aria-label={
+                      unavailable ? `${option.name} — sold out` : option.name
+                    }
+                    onClick={() => selectColor(option.name)}
+                    className={`h-9 w-9 rounded-full border sm:h-7 sm:w-7 ${
+                      color === option.name ? "border-ink p-0.5" : "border-line"
+                    } ${unavailable ? "opacity-40" : ""}`}
+                  >
+                    <span
+                      className="block h-full w-full rounded-full"
+                      style={{ backgroundColor: option.hex }}
+                    />
+                  </button>
+                );
+              })}
             </div>
           </fieldset>
         ) : null}
@@ -163,11 +187,15 @@ export function ProductDetail({ product }: { product: Product }) {
           </div>
         </fieldset>
 
+        <p className="mt-4 text-[11px] uppercase tracking-[0.18em] text-muted">
+          {soldOut ? "Sold out" : "In stock — ships within 48 hours"}
+        </p>
+
         {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
 
         <div className="mt-8 hidden flex-col gap-3 sm:flex-row md:flex">
-          <Button className="flex-1" onClick={add}>
-            Add to bag
+          <Button className="flex-1" onClick={add} disabled={soldOut}>
+            {soldOut ? "Sold out" : "Add to bag"}
           </Button>
           <Button href="/shipping" variant="outline" className="flex-1">
             Shipping & returns
@@ -186,11 +214,13 @@ export function ProductDetail({ product }: { product: Product }) {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm">{formatPrice(price)}</p>
             <p className="truncate text-[11px] text-muted">
-              {[color, size].filter(Boolean).join(" / ") || "Select a size"}
+              {soldOut
+                ? "Sold out"
+                : [color, size].filter(Boolean).join(" / ") || "Select a size"}
             </p>
           </div>
-          <Button className="shrink-0" onClick={add}>
-            Add to bag
+          <Button className="shrink-0" onClick={add} disabled={soldOut}>
+            {soldOut ? "Sold out" : "Add to bag"}
           </Button>
         </div>
       </div>

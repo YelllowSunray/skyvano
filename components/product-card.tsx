@@ -13,10 +13,16 @@ export function ProductCard({ product }: { product: Product }) {
   const [open, setOpen] = useState(false);
 
   // Sizes are per colour, so only offer the ones actually orderable.
-  const sizes = product.variants
-    .filter((variant) => variant.available && (!color || variant.color === color))
-    .map((variant) => variant.size);
-  const availableSizes = sizes.length > 0 ? [...new Set(sizes)] : product.sizes;
+  const availableSizes = [
+    ...new Set(
+      product.variants
+        .filter(
+          (variant) => variant.available && (!color || variant.color === color),
+        )
+        .map((variant) => variant.size),
+    ),
+  ];
+  const soldOut = availableSizes.length === 0;
 
   return (
     <article className="group min-w-0">
@@ -27,7 +33,9 @@ export function ProductCard({ product }: { product: Product }) {
             alt={product.name}
             fill
             sizes="(min-width: 1024px) 25vw, 50vw"
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            className={`object-cover transition-transform duration-700 group-hover:scale-105 ${
+              soldOut ? "opacity-60" : ""
+            }`}
           />
           {product.images[1] ? (
             <Image
@@ -39,7 +47,11 @@ export function ProductCard({ product }: { product: Product }) {
             />
           ) : null}
         </Link>
-        {product.tags.includes("sale") ? (
+        {soldOut ? (
+          <span className="absolute left-2 top-2 bg-white px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-ink sm:left-3 sm:top-3">
+            Sold out
+          </span>
+        ) : product.tags.includes("sale") ? (
           <span className="absolute left-2 top-2 bg-ink px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-white sm:left-3 sm:top-3">
             Sale
           </span>
@@ -49,7 +61,11 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
         ) : null}
         <div className="absolute inset-x-2 bottom-2 z-10 sm:inset-x-3 sm:bottom-3 sm:translate-y-3 sm:opacity-0 sm:transition-all sm:duration-300 sm:group-hover:translate-y-0 sm:group-hover:opacity-100">
-          {open ? (
+          {soldOut ? (
+            <p className="w-full bg-ivory/95 py-2 text-center text-[10px] uppercase tracking-[0.16em] text-muted sm:py-3 sm:text-[11px] sm:tracking-[0.22em]">
+              Sold out
+            </p>
+          ) : open ? (
             <div className="max-h-28 overflow-y-auto bg-ivory/95 p-2 sm:max-h-none sm:p-3">
               <p className="mb-2 text-[10px] uppercase tracking-[0.18em]">
                 Select size
@@ -104,18 +120,25 @@ export function ProductCard({ product }: { product: Product }) {
           )}
         </p>
         <div className="mt-2 flex flex-wrap gap-2 sm:mt-3">
-          {product.colors.map((option) => (
-            <button
-              key={option.name}
-              type="button"
-              aria-label={option.name}
-              onClick={() => setColor(option.name)}
-              className={`h-5 w-5 rounded-full border sm:h-3.5 sm:w-3.5 ${
-                color === option.name ? "border-ink" : "border-transparent"
-              }`}
-              style={{ backgroundColor: option.hex }}
-            />
-          ))}
+          {product.colors.map((option) => {
+            const unavailable = !product.variants.some(
+              (variant) => variant.color === option.name && variant.available,
+            );
+            return (
+              <button
+                key={option.name}
+                type="button"
+                aria-label={
+                  unavailable ? `${option.name} — sold out` : option.name
+                }
+                onClick={() => setColor(option.name)}
+                className={`h-5 w-5 rounded-full border sm:h-3.5 sm:w-3.5 ${
+                  color === option.name ? "border-ink" : "border-transparent"
+                } ${unavailable ? "opacity-40" : ""}`}
+                style={{ backgroundColor: option.hex }}
+              />
+            );
+          })}
         </div>
       </div>
     </article>
