@@ -16,6 +16,7 @@ import {
 } from "@/lib/shopify/map-product";
 import { ALL_PRODUCTS_QUERY, BEST_SELLING_QUERY } from "@/lib/shopify/queries";
 import { shopifyStorefrontGraphql } from "@/lib/shopify/storefront";
+import { buildSearchIndex, searchIndex, type SearchIndex } from "@/lib/search";
 
 /** Pages are prerendered and refreshed on this interval. */
 export const CATALOG_REVALIDATE_SECONDS = 900;
@@ -37,6 +38,7 @@ type Catalog = {
   bySlug: Map<string, Product>;
   bestSellers: Product[];
   brands: Brand[];
+  search: SearchIndex;
 };
 
 type AllProductsResponse = {
@@ -141,7 +143,13 @@ const loadCatalog = cache(async (): Promise<Catalog> => {
     .map((handle) => bySlug.get(handle))
     .filter((product): product is Product => Boolean(product));
 
-  return { products, bySlug, bestSellers, brands: buildBrands(products) };
+  return {
+    products,
+    bySlug,
+    bestSellers,
+    brands: buildBrands(products),
+    search: buildSearchIndex(products),
+  };
 });
 
 export async function getAllProducts() {
@@ -231,26 +239,10 @@ export async function getRelatedProducts(product: Product, limit = 4) {
   return related;
 }
 
+/** Ranked by relevance. An empty query returns nothing, not the whole store. */
 export async function searchProducts(query: string) {
-  const { products } = await loadCatalog();
-  const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-  if (terms.length === 0) return products;
-
-  return products.filter((product) => {
-    const haystack = [
-      product.name,
-      product.brand,
-      product.subcategory,
-      product.department,
-      product.gender,
-      product.season ?? "",
-      product.description,
-      ...product.colors.map((color) => color.name),
-    ]
-      .join(" ")
-      .toLowerCase();
-    return terms.every((term) => haystack.includes(term));
-  });
+  const { search } = await loadCatalog();
+  return searchIndex(search, query);
 }
 
 export type CollectionPreview = {

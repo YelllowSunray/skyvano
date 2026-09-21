@@ -84,6 +84,27 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return () => window.clearTimeout(timeout);
   }, [toast]);
 
+  // Escape closes whatever is open, and ⌘K is where shoppers reach for search.
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsCartOpen(false);
+        setIsSearchOpen(false);
+        setIsMenuOpen(false);
+        return;
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        setIsCartOpen(false);
+        setIsMenuOpen(false);
+        setIsSearchOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
   useEffect(() => {
     const locked = isCartOpen || isSearchOpen || isMenuOpen;
     document.body.style.overflow = locked ? "hidden" : "";

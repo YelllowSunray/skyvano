@@ -50,6 +50,10 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   const brands = await getBrands();
+  // The empty search panel offers the best-stocked houses as a starting point.
+  const searchBrands = [...brands]
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+    .slice(0, 8);
 
   return (
     <html
@@ -64,7 +68,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <main className="flex-1">{children}</main>
           <SiteFooter />
           <CartDrawer />
-          <SearchModal />
+          <SearchModal brands={searchBrands} />
           <Toast />
         </StoreProvider>
       </body>
