@@ -22,7 +22,7 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.skyvano.com"),
+  metadataBase: new URL("https://skyvano.com"),
   title: {
     default: "Skyvano | Elevated style. Everyday luxury.",
     template: "%s | Skyvano",
