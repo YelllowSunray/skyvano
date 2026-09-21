@@ -57,3 +57,33 @@ export const BEST_SELLING_QUERY = /* GraphQL */ `
     }
   }
 `;
+
+/**
+ * The lines come back so the caller can confirm Shopify actually took the
+ * quantities it was asked for; checkoutUrl is Shopify's hosted payment page.
+ */
+export const CART_CREATE_MUTATION = /* GraphQL */ `
+  mutation CartCreate($lines: [CartLineInput!]!) {
+    cartCreate(input: { lines: $lines }) {
+      cart {
+        id
+        checkoutUrl
+        totalQuantity
+        lines(first: 250) {
+          nodes {
+            quantity
+            merchandise {
+              ... on ProductVariant {
+                id
+              }
+            }
+          }
+        }
+      }
+      userErrors {
+        field
+        message
+      }
+    }
+  }
+`;
