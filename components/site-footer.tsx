@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { InstagramIcon, PinterestIcon, TikTokIcon } from "@/components/icons";
 import { NewsletterForm } from "@/components/newsletter-form";
-import { PAYMENT_METHODS } from "@/lib/payments";
+import { PaymentMarks } from "@/components/payment-marks";
 
 const shopLinks = [
   ["New Arrivals", "/collections/new-arrivals"],
@@ -124,18 +124,7 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 text-xs text-white/50 md:flex-row md:items-center md:justify-between md:px-8">
           <p>© {new Date().getFullYear()} Skyvano. All rights reserved.</p>
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {PAYMENT_METHODS.map(
-              (method) => (
-                <span
-                  key={method}
-                  className="rounded-sm border border-white/20 px-2 py-1 uppercase tracking-[0.12em]"
-                >
-                  {method}
-                </span>
-              ),
-            )}
-          </div>
+          <PaymentMarks />
         </div>
         <p className="mx-auto max-w-7xl px-4 pb-8 text-[11px] leading-5 text-white/40 md:px-8">
           Skyvano is an independent luxury retailer. Designer names are used to
