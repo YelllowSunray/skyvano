@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/json-ld";
 import { PageIntro } from "@/components/page-intro";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "FAQ",
   description: "Answers to the most common Skyvano questions.",
-};
+  path: "/faq",
+});
 
 const faqs = [
   {
@@ -40,6 +43,17 @@ const faqs = [
 export default function FaqPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 pb-24 md:px-8">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: faqs.map((item) => ({
+            "@type": "Question",
+            name: item.q,
+            acceptedAnswer: { "@type": "Answer", text: item.a },
+          })),
+        }}
+      />
       <PageIntro eyebrow="Help" title="Frequently asked questions">
         Straight answers. If yours is not here, write to client care.
       </PageIntro>

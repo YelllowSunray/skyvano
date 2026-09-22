@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { PageIntro, Prose, TextLink } from "@/components/page-intro";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Returns",
   description: "How to return or exchange a Skyvano order.",
-};
+  path: "/returns",
+});
 
 export default function ReturnsPage() {
   return (

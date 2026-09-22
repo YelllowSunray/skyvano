@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { PageIntro, Prose } from "@/components/page-intro";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
   description: "How Skyvano collects and uses personal information.",
-};
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
   return (

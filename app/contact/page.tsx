@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
 import { PageIntro } from "@/components/page-intro";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Contact",
   description: "Get in touch with the Skyvano client care team.",
-};
+  path: "/contact",
+});
 
 export default function ContactPage() {
   return (

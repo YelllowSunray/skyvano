@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageIntro } from "@/components/page-intro";
 import { getBrands } from "@/lib/catalog";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Brands",
   description: "Shop the designer houses in the Skyvano edit.",
-};
+  path: "/brands",
+});
 
 export default async function BrandsPage() {
   const brands = await getBrands();

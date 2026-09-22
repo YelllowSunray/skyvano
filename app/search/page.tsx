@@ -6,6 +6,8 @@ import { searchProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Search",
+  robots: { index: false, follow: false },
+  alternates: { canonical: "/search" },
 };
 
 const SUGGESTIONS = ["Barbour", "Blazer", "Boots", "Black", "Bags", "Sale"];

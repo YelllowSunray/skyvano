@@ -23,6 +23,18 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/",
+        has: [{ type: "host", value: "www.skyvano.com" }],
+        destination: "https://skyvano.com",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.skyvano.com" }],
+        destination: "https://skyvano.com/:path*",
+        permanent: true,
+      },
+      {
         source: "/cart/c/:path*",
         destination: `https://${shopifyStore}/cart/c/:path*`,
         permanent: false,

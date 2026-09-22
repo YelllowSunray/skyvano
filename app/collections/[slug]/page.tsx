@@ -14,6 +14,7 @@ import {
   type Filters,
 } from "@/lib/collection-view";
 import { collections, getCollection, isCollectionSlug } from "@/lib/products";
+import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
 export function generateStaticParams() {
@@ -27,11 +28,15 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const collection = getCollection(slug);
-  return {
-    title: collection?.title ?? "Collection",
-    description: collection?.description,
-    alternates: { canonical: `/collections/${slug}` },
-  };
+  if (!collection) {
+    return { title: "Collection", robots: { index: false, follow: false } };
+  }
+
+  return pageMetadata({
+    title: collection.title,
+    description: collection.description,
+    path: `/collections/${collection.slug}`,
+  });
 }
 
 type SearchParams = {

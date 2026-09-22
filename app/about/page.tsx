@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { PageIntro, Prose } from "@/components/page-intro";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About Us",
   description: "The story of Skyvano, a curated luxury designer boutique.",
-};
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

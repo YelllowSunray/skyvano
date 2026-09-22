@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { PageIntro, Prose } from "@/components/page-intro";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Terms & Conditions",
   description: "The terms that apply to purchases from Skyvano.",
-};
+  path: "/terms",
+});
 
 export default function TermsPage() {
   return (

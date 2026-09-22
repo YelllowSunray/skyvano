@@ -8,7 +8,8 @@ import { SiteHeader } from "@/components/site-header";
 import { StoreProvider } from "@/components/store-provider";
 import { Toast } from "@/components/toast";
 import { getBrands } from "@/lib/catalog";
-import { SITE_URL } from "@/lib/site";
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE } from "@/lib/seo";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 // Keep in sync with CATALOG_REVALIDATE_SECONDS; Next requires a literal here.
@@ -29,17 +30,32 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Skyvano | Elevated style. Everyday luxury.",
+    default: DEFAULT_TITLE,
     template: "%s | Skyvano",
   },
-  description:
-    "Skyvano is a curated luxury boutique for designer clothing and accessories for women and men.",
-  alternates: {
-    canonical: "/",
+  description: DEFAULT_DESCRIPTION,
+  // Canonicals are set per page. A root `/` here would tell Google every
+  // route is a duplicate of the homepage.
+  openGraph: {
+    type: "website",
+    locale: "en_NL",
+    siteName: SITE_NAME,
+    images: [{ url: "/logo.png", alt: SITE_NAME }],
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  icons: {
+    icon: [{ url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png" }],
   },
   appleWebApp: {
     capable: false,
-    title: "Skyvano",
+    title: SITE_NAME,
   },
 };
 

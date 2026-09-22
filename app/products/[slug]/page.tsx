@@ -3,8 +3,10 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ProductCard } from "@/components/product-card";
 import { ProductDetail } from "@/components/product-detail";
+import { JsonLd } from "@/components/json-ld";
 import { getAllProducts, getProduct, getRelatedProducts } from "@/lib/catalog";
 import { brandToSlug, type Product } from "@/lib/products";
+import { absoluteUrl, pageMetadata } from "@/lib/seo";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 export async function generateStaticParams() {
@@ -19,20 +21,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProduct(slug);
-  if (!product) return { title: "Product" };
+  if (!product) return { title: "Product", robots: { index: false, follow: false } };
 
-  return {
+  return pageMetadata({
     title: `${product.name} — ${product.brand}`,
     description: product.description,
-    alternates: { canonical: `/products/${product.slug}` },
-    openGraph: {
-      type: "website",
-      title: `${product.name} — ${product.brand}`,
-      description: product.description,
-      url: `${SITE_URL}/products/${product.slug}`,
-      images: product.images.slice(0, 1).map((url) => ({ url })),
-    },
-  };
+    path: `/products/${product.slug}`,
+    images: product.images.slice(0, 1),
+  });
 }
 
 /**
@@ -41,6 +37,9 @@ export async function generateMetadata({
  * the sizes that can be bought.
  */
 function productSchema(product: Product) {
+  const url = absoluteUrl(`/products/${product.slug}`);
+  const prices = product.variants.map((variant) => variant.price);
+
   return {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -48,18 +47,32 @@ function productSchema(product: Product) {
     description: product.description,
     image: product.images,
     sku: product.slug,
+    url,
     brand: { "@type": "Brand", name: product.brand },
-    offers: product.variants.map((variant) => ({
-      "@type": "Offer",
-      url: `${SITE_URL}/products/${product.slug}`,
+    offers: {
+      "@type": "AggregateOffer",
+      url,
       priceCurrency: "EUR",
-      price: variant.price,
-      itemCondition: "https://schema.org/NewCondition",
-      availability: variant.available
+      lowPrice: Math.min(...prices),
+      highPrice: Math.max(...prices),
+      offerCount: product.variants.length,
+      availability: product.available
         ? "https://schema.org/InStock"
         : "https://schema.org/OutOfStock",
+      itemCondition: "https://schema.org/NewCondition",
       seller: { "@type": "Organization", name: SITE_NAME },
-    })),
+      offers: product.variants.map((variant) => ({
+        "@type": "Offer",
+        url,
+        priceCurrency: "EUR",
+        price: variant.price,
+        itemCondition: "https://schema.org/NewCondition",
+        availability: variant.available
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+        seller: { "@type": "Organization", name: SITE_NAME },
+      })),
+    },
   };
 }
 
@@ -100,10 +113,7 @@ export default async function ProductPage({
           </div>
         </section>
       ) : null}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema(product)) }}
-      />
+      <JsonLd data={productSchema(product)} />
     </>
   );
 }

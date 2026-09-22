@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BagIcon, CloseIcon, MenuIcon, SearchIcon } from "@/components/icons";
+import { Marquee } from "@/components/marquee";
 import { useStore } from "@/components/store-provider";
 import { NavbarBackButton } from "@/components/smart-back";
 import type { Brand } from "@/lib/catalog";
@@ -40,22 +41,16 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
 
   return (
     <header className="sticky top-0 z-50">
-      <div className="overflow-hidden bg-ink text-gold">
-        <div className="flex w-max marquee-track">
-          {[0, 1].map((copy) => (
-            <p
-              key={copy}
-              className="flex items-center py-2 text-[10px] uppercase tracking-[0.22em] sm:py-2.5 sm:text-[11px] sm:tracking-[0.28em]"
-            >
-              {messages.map((message) => (
-                <span key={`${copy}-${message}`} className="px-5 sm:px-8">
-                  {message}
-                </span>
-              ))}
-            </p>
-          ))}
-        </div>
-      </div>
+      <Marquee
+        className="bg-ink text-gold"
+        trackClassName="items-center py-2 text-[10px] uppercase tracking-[0.22em] sm:py-2.5 sm:text-[11px] sm:tracking-[0.28em]"
+      >
+        {messages.map((message) => (
+          <span key={message} className="px-5 sm:px-8">
+            {message}
+          </span>
+        ))}
+      </Marquee>
 
       <div className="border-b border-line bg-ivory/95 backdrop-blur-md">
         <div className="mx-auto grid h-14 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-3 sm:h-16 sm:px-5 lg:px-8">

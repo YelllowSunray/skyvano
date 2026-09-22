@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { PageIntro, Prose, TextLink } from "@/components/page-intro";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Shipping & Delivery",
   description: "Skyvano shipping times, costs and delivery partners.",
-};
+  path: "/shipping",
+});
 
 export default function ShippingPage() {
   return (
