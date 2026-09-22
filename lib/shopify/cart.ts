@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getShopifyConfig } from "@/lib/shopify/config";
 import { CART_CREATE_MUTATION } from "@/lib/shopify/queries";
 import {
   ShopifyStorefrontError,
@@ -119,7 +120,10 @@ export async function createShopifyCheckout(
     };
   }
 
-  return { ok: true, checkoutUrl: withReturnTo(cart.checkoutUrl, returnOrigin) };
+  return {
+    ok: true,
+    checkoutUrl: hostedCheckoutUrl(cart.checkoutUrl, returnOrigin),
+  };
 }
 
 function isThrottled(error: unknown) {
@@ -147,12 +151,21 @@ async function cartCreate(variables: { lines: Array<{ merchandiseId: string; qua
   throw lastError;
 }
 
-/** So "Return to store" / Back lands on this site, not the theme cart. */
-function withReturnTo(checkoutUrl: string, origin?: string) {
-  if (!origin) return checkoutUrl;
+/**
+ * Headless "Storefront URL" rewrites checkout onto skyvano.com. Next has no
+ * /cart/c/[id] route, so production 404s while localhost (myshopify host) works.
+ * Always send payment to the Shopify shop domain; return_to still comes home.
+ */
+function hostedCheckoutUrl(checkoutUrl: string, origin?: string) {
   try {
     const url = new URL(checkoutUrl);
-    url.searchParams.set("return_to", `${origin}/cart`);
+    const store = getShopifyConfig().storeDomain;
+    if (store) {
+      url.protocol = "https:";
+      url.hostname = store;
+      url.port = "";
+    }
+    if (origin) url.searchParams.set("return_to", `${origin}/cart`);
     return url.toString();
   } catch {
     return checkoutUrl;
