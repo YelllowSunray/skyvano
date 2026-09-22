@@ -17,6 +17,7 @@ const PRODUCT_FIELDS = /* GraphQL */ `
       nodes {
         id
         availableForSale
+        quantityAvailable
         price {
           amount
         }
@@ -32,6 +33,11 @@ const PRODUCT_FIELDS = /* GraphQL */ `
   }
 `;
 
+/**
+ * `quantityAvailable` is the unit count. Without a buyer market it follows
+ * Admin on-hand; `@inContext` would collapse it to "sellable online" and
+ * mark the whole catalogue sold out.
+ */
 export const ALL_PRODUCTS_QUERY = /* GraphQL */ `
   ${PRODUCT_FIELDS}
   query AllProducts($cursor: String) {

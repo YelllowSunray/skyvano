@@ -27,7 +27,8 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await createShopifyCheckout(parsed);
+    const origin = request.headers.get("origin") ?? undefined;
+    const result = await createShopifyCheckout(parsed, origin);
 
     if (result.ok) {
       return NextResponse.json({ checkoutUrl: result.checkoutUrl });
@@ -40,10 +41,9 @@ export async function POST(request: Request) {
       { status: result.reason === "unavailable" ? 409 : 400 },
     );
   } catch (error) {
-    // Token, network, or store-configuration problems land here.
     console.error("Shopify checkout failed", error);
     return NextResponse.json(
-      { error: "Checkout is unavailable right now. Please try again shortly." },
+      { error: "Could not start checkout. Please try again." },
       { status: 502 },
     );
   }

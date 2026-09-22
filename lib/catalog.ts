@@ -14,14 +14,18 @@ import {
   type MappedProduct,
   type ShopifyProductNode,
 } from "@/lib/shopify/map-product";
-import { fetchSellableVariantIds } from "@/lib/shopify/availability";
 import { ALL_PRODUCTS_QUERY, BEST_SELLING_QUERY } from "@/lib/shopify/queries";
 import { shopifyStorefrontGraphql } from "@/lib/shopify/storefront";
+import { preferAvailable } from "@/lib/collection-view";
+import {
+  applyInventoryQuantities,
+  fetchAdminVariantQuantities,
+} from "@/lib/shopify/inventory";
 import { buildSearchIndex, searchIndex, type SearchIndex } from "@/lib/search";
 
 /** Pages are prerendered and refreshed on this interval. */
-export const CATALOG_REVALIDATE_SECONDS = 900;
-export const CATALOG_TAG = "shopify-catalog";
+export const CATALOG_REVALIDATE_SECONDS = 60;
+export const CATALOG_TAG = "shopify-catalog-stock";
 
 const NEWEST_COUNT = 12;
 const BEST_SELLING_COUNT = 24;
@@ -110,30 +114,6 @@ function buildBrands(products: Product[]): Brand[] {
   return [...brands.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/**
- * Real per-variant availability, or null when the answer cannot be trusted.
- *
- * A store where nothing at all is sellable is a configuration fault — stock
- * never imported, or a location that does not fulfil online orders — not 94
- * products that genuinely sold out at once. Painting the entire storefront
- * "Sold out" on that basis would hide a working catalogue, so the optimistic
- * flags stand and the checkout guard still stops anyone paying for thin air.
- */
-async function resolveSellableVariants(products: MappedProduct[]) {
-  const variantIds = products.flatMap((product) =>
-    product.variants.map((variant) => variant.id),
-  );
-  if (variantIds.length === 0) return null;
-
-  try {
-    const sellable = await fetchSellableVariantIds(variantIds, fetchOptions);
-    return sellable.size === 0 ? null : sellable;
-  } catch {
-    // Never let an availability probe take the whole catalogue down.
-    return null;
-  }
-}
-
 const loadCatalog = cache(async (): Promise<Catalog> => {
   if (!isShopifyReady()) {
     throw new Error(
@@ -141,38 +121,29 @@ const loadCatalog = cache(async (): Promise<Catalog> => {
     );
   }
 
-  const [nodes, bestSellingHandles] = await Promise.all([
+  const [nodes, bestSellingHandles, adminQuantities] = await Promise.all([
     fetchAllProducts(),
     fetchBestSellingHandles(),
+    fetchAdminVariantQuantities(),
   ]);
 
-  const mapped: MappedProduct[] = nodes
-    .map(mapShopifyProduct)
-    .filter((product) => product.images.length > 0 && product.variants.length > 0);
+  const mapped: MappedProduct[] = applyInventoryQuantities(
+    nodes
+      .map(mapShopifyProduct)
+      .filter((product) => product.images.length > 0 && product.variants.length > 0),
+    adminQuantities,
+  );
 
   const bestSellingRank = new Map(
     bestSellingHandles.map((handle, index) => [handle, index]),
   );
-
-  const sellable = await resolveSellableVariants(mapped);
 
   // Shopify already returned newest first, so position stands in for recency.
   const products: Product[] = mapped.map((product, index) => {
     const tags = [...product.tags];
     if (index < NEWEST_COUNT) tags.push("new");
     if (bestSellingRank.has(product.slug)) tags.push("bestseller");
-
-    const variants = product.variants.map((variant) => ({
-      ...variant,
-      available: sellable === null ? variant.available : sellable.has(variant.id),
-    }));
-
-    return {
-      ...product,
-      tags,
-      variants,
-      available: variants.some((variant) => variant.available),
-    };
+    return { ...product, tags };
   });
 
   const bySlug = new Map(products.map((product) => [product.slug, product]));
@@ -269,7 +240,7 @@ export async function getRelatedProducts(product: Product, limit = 4) {
 
   const related: Product[] = [];
   for (const group of ranked) {
-    for (const item of group) {
+    for (const item of preferAvailable(group)) {
       if (related.length >= limit) return related;
       if (!related.some((existing) => existing.id === item.id)) related.push(item);
     }
@@ -306,6 +277,8 @@ export async function getCollectionPreviews(slugs: CollectionSlug[]) {
 
     const items = await getProductsByCollection(slug);
     const preferred = [
+      ...items.filter((item) => item.available && item.department === "clothing"),
+      ...items.filter((item) => item.available),
       ...items.filter((item) => item.department === "clothing"),
       ...items,
     ];

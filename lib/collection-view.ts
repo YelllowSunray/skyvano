@@ -89,17 +89,25 @@ export function buildFacets(products: Product[]) {
   };
 }
 
+/** In-stock pieces first, original order otherwise — what Dawn does on a grid. */
+export function preferAvailable(products: Product[]) {
+  return sortProducts(products, "featured");
+}
+
 export function filterProducts(products: Product[], filters: Filters) {
   return products.filter((product) => {
     if (filters.inStockOnly && !product.available) return false;
     if (filters.brands.length > 0 && !filters.brands.includes(product.brand)) {
       return false;
     }
-    if (
-      filters.sizes.length > 0 &&
-      !product.sizes.some((size) => filters.sizes.includes(size))
-    ) {
-      return false;
+    if (filters.sizes.length > 0) {
+      const hasSize = filters.inStockOnly
+        ? product.variants.some(
+            (variant) =>
+              variant.available && filters.sizes.includes(variant.size),
+          )
+        : product.sizes.some((size) => filters.sizes.includes(size));
+      if (!hasSize) return false;
     }
     if (
       filters.colours.length > 0 &&

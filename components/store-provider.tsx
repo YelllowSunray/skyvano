@@ -108,8 +108,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const locked = isCartOpen || isSearchOpen || isMenuOpen;
     document.body.style.overflow = locked ? "hidden" : "";
+    document.documentElement.style.overflow = locked ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
     };
   }, [isCartOpen, isMenuOpen, isSearchOpen]);
 
@@ -128,6 +130,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const variant = product.variants.find(
         (option) => option.color === color && option.size === size,
       );
+      if (!variant?.available) {
+        setToast("Sold out");
+        return;
+      }
       const key = `${product.id}-${color}-${size}`;
       setCart((current) => {
         const existing = current.find((item) => item.key === key);

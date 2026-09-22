@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { CollectionToolbar } from "@/components/collection-toolbar";
 import { PageIntro } from "@/components/page-intro";
@@ -85,13 +86,15 @@ export default async function CollectionPage({
       <PageIntro eyebrow="Collection" title={collection.title}>
         {collection.description}
       </PageIntro>
-      <CollectionToolbar
-        total={all.length}
-        shown={items.length}
-        sort={sort}
-        filters={filters}
-        facets={facets}
-      />
+      <Suspense>
+        <CollectionToolbar
+          total={all.length}
+          shown={items.length}
+          sort={sort}
+          filters={filters}
+          facets={facets}
+        />
+      </Suspense>
       <ProductGrid products={items} />
     </div>
   );

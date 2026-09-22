@@ -74,13 +74,17 @@ function SearchPanel({
 
   const submit = () => {
     if (!term) return;
+    // The overlay locks document scroll; clear it before leaving so the
+    // results page is not left unable to move.
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
     onClose();
     router.push(`/search?q=${encodeURIComponent(term)}`);
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex h-dvh flex-col bg-ivory pt-[env(safe-area-inset-top)]">
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4 py-5 md:px-8 md:py-8">
+    <div className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-ivory pt-[env(safe-area-inset-top)]">
+      <div className="mx-auto min-h-dvh w-full max-w-3xl px-4 py-5 pb-[max(2rem,env(safe-area-inset-bottom))] md:px-8 md:py-8">
         <div className="mb-5 flex items-center justify-between sm:mb-8">
           <p className="text-[11px] uppercase tracking-[0.28em] text-gold">
             Search Skyvano
@@ -121,10 +125,7 @@ function SearchPanel({
           ) : null}
         </form>
 
-        <div
-          aria-live="polite"
-          className="mt-6 flex-1 overflow-y-auto pb-[max(1.5rem,env(safe-area-inset-bottom))]"
-        >
+        <div aria-live="polite" className="mt-6">
           {!term ? (
             <div className="space-y-8">
               <div>

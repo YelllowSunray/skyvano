@@ -1,7 +1,10 @@
 import "server-only";
 
 import { CART_CREATE_MUTATION } from "@/lib/shopify/queries";
-import { shopifyStorefrontGraphql } from "@/lib/shopify/storefront";
+import {
+  ShopifyStorefrontError,
+  shopifyStorefrontGraphql,
+} from "@/lib/shopify/storefront";
 
 export type CheckoutLine = {
   variantId: string;
@@ -43,6 +46,7 @@ type CartCreateResponse = {
  */
 export async function createShopifyCheckout(
   lines: CheckoutLine[],
+  returnOrigin?: string,
 ): Promise<CheckoutResult> {
   const requested = new Map<string, number>();
 
@@ -71,15 +75,14 @@ export async function createShopifyCheckout(
     return { ok: false, reason: "invalid", message: "Your bag is empty." };
   }
 
-  const data = await shopifyStorefrontGraphql<CartCreateResponse>(
-    CART_CREATE_MUTATION,
-    {
-      lines: [...requested].map(([merchandiseId, quantity]) => ({
-        merchandiseId,
-        quantity,
-      })),
-    },
-  );
+  const payload = {
+    lines: [...requested].map(([merchandiseId, quantity]) => ({
+      merchandiseId,
+      quantity,
+    })),
+  };
+
+  const data = await cartCreate(payload);
 
   const { cart, userErrors } = data.cartCreate;
 
@@ -110,11 +113,48 @@ export async function createShopifyCheckout(
       reason: "unavailable",
       message:
         short.length === requested.size
-          ? "These pieces are currently out of stock, so checkout cannot be completed."
-          : "Some pieces in your bag are no longer in stock. Please remove them to continue.",
+          ? "These pieces have stock. Shopify still will not take payment until the warehouse can fulfil web orders. In Admin: Settings → Locations → open the location that holds the units → turn on Fulfil online orders from this location → Save, then checkout again."
+          : "Shopify rejected some pieces in the bag. Remove them to continue.",
       variantIds: short.map(([variantId]) => variantId),
     };
   }
 
-  return { ok: true, checkoutUrl: cart.checkoutUrl };
+  return { ok: true, checkoutUrl: withReturnTo(cart.checkoutUrl, returnOrigin) };
+}
+
+function isThrottled(error: unknown) {
+  return (
+    error instanceof ShopifyStorefrontError && /throttled/i.test(error.message)
+  );
+}
+
+async function cartCreate(variables: { lines: Array<{ merchandiseId: string; quantity: number }> }) {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      return await shopifyStorefrontGraphql<CartCreateResponse>(
+        CART_CREATE_MUTATION,
+        variables,
+      );
+    } catch (error) {
+      lastError = error;
+      if (!isThrottled(error) || attempt === 3) throw error;
+      await new Promise((resolve) =>
+        setTimeout(resolve, 400 * 2 ** attempt),
+      );
+    }
+  }
+  throw lastError;
+}
+
+/** So "Return to store" / Back lands on this site, not the theme cart. */
+function withReturnTo(checkoutUrl: string, origin?: string) {
+  if (!origin) return checkoutUrl;
+  try {
+    const url = new URL(checkoutUrl);
+    url.searchParams.set("return_to", `${origin}/cart`);
+    return url.toString();
+  } catch {
+    return checkoutUrl;
+  }
 }

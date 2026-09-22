@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PageIntro } from "@/components/page-intro";
 import { ProductGrid } from "@/components/product-grid";
 import { getBrandBySlug, getBrands, getProductsByBrand } from "@/lib/catalog";
+import { sortProducts } from "@/lib/collection-view";
 
 export async function generateStaticParams() {
   const brands = await getBrands();
@@ -40,7 +41,7 @@ export default async function BrandPage({
         {items.length} {items.length === 1 ? "piece" : "pieces"} in the Skyvano
         edit.
       </PageIntro>
-      <ProductGrid products={items} />
+      <ProductGrid products={sortProducts(items, "featured")} />
     </div>
   );
 }

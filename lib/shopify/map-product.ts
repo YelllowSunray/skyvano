@@ -21,6 +21,7 @@ export type ShopifyProductNode = {
     nodes: Array<{
       id: string;
       availableForSale: boolean;
+      quantityAvailable?: number | null;
       price: { amount: string };
       compareAtPrice: { amount: string } | null;
       selectedOptions: Array<{ name: string; value: string }>;
@@ -250,7 +251,14 @@ export function mapShopifyProduct(node: ShopifyProductNode): MappedProduct {
       price,
       compareAtPrice:
         compareAtPrice && compareAtPrice > price ? compareAtPrice : undefined,
-      available: variant.availableForSale,
+      quantity:
+        variant.quantityAvailable == null
+          ? undefined
+          : variant.quantityAvailable,
+      available:
+        variant.quantityAvailable == null
+          ? variant.availableForSale
+          : variant.quantityAvailable > 0,
     };
   });
 
@@ -298,6 +306,6 @@ export function mapShopifyProduct(node: ShopifyProductNode): MappedProduct {
     variants,
     description: buildDescription(gender, subcategory, fields),
     details: buildDetails(fields),
-    available: node.availableForSale,
+    available: variants.some((variant) => variant.available),
   };
 }

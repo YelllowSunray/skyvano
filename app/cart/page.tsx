@@ -49,6 +49,7 @@ export default function CartPage() {
       if (!response.ok || !data.checkoutUrl) {
         setError(data.error ?? "Checkout is unavailable right now.");
         setRejected(data.variantIds ?? []);
+        setPending(false);
         return;
       }
 
@@ -76,8 +77,10 @@ export default function CartPage() {
         <div className="grid gap-10 lg:grid-cols-[1.4fr_0.8fr] lg:gap-12">
           <ul>
             {cart.map((item) => {
-              const unavailable =
-                !item.variantId || rejected.includes(item.variantId);
+              const missingVariant = !item.variantId;
+              const blocked = Boolean(
+                item.variantId && rejected.includes(item.variantId),
+              );
 
               return (
                 <li
@@ -106,9 +109,13 @@ export default function CartPage() {
                     <p className="mt-1 text-sm text-muted">
                       {item.color} / {item.size}
                     </p>
-                    {unavailable ? (
+                    {missingVariant ? (
                       <p className="mt-2 text-xs uppercase tracking-[0.16em] text-red-700">
-                        Out of stock
+                        Remove and add again
+                      </p>
+                    ) : blocked ? (
+                      <p className="mt-2 text-xs uppercase tracking-[0.16em] text-red-700">
+                        In stock — checkout blocked
                       </p>
                     ) : null}
                     <div className="mt-3 flex flex-wrap items-center justify-between gap-3 sm:mt-4">

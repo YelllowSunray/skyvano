@@ -1,6 +1,8 @@
 import "server-only";
 
 const DEFAULT_API_VERSION = "2026-07";
+/** The store only sells to the Netherlands; inventory is per-market. */
+const DEFAULT_COUNTRY = "NL";
 
 function read(name: string) {
   return process.env[name]?.trim() ?? "";
@@ -15,6 +17,8 @@ export type ShopifyConfig = {
   storefrontToken: string;
   storefrontPrivateToken: string;
   webhookSecret: string;
+  /** ISO country for Storefront `@inContext`. Inventory is market-specific. */
+  country: string;
 };
 
 export function getShopifyConfig(): ShopifyConfig {
@@ -29,6 +33,7 @@ export function getShopifyConfig(): ShopifyConfig {
     storefrontToken: read("SHOPIFY_STOREFRONT_ACCESS_TOKEN"),
     storefrontPrivateToken: read("SHOPIFY_STOREFRONT_PRIVATE_TOKEN"),
     webhookSecret: read("SHOPIFY_WEBHOOK_SECRET"),
+    country: (read("SHOPIFY_STORE_COUNTRY") || DEFAULT_COUNTRY).toUpperCase(),
   };
 }
 

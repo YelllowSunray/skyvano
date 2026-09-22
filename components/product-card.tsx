@@ -7,22 +7,31 @@ import { useStore } from "@/components/store-provider";
 import { formatPrice } from "@/lib/format";
 import type { Product } from "@/lib/products";
 
+function firstAvailableColor(product: Product) {
+  return (
+    product.colors.find((colour) =>
+      product.variants.some(
+        (variant) => variant.color === colour.name && variant.available,
+      ),
+    )?.name ??
+    product.colors[0]?.name ??
+    ""
+  );
+}
+
 export function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useStore();
-  const [color, setColor] = useState(product.colors[0]?.name ?? "");
+  const [color, setColor] = useState(() => firstAvailableColor(product));
   const [open, setOpen] = useState(false);
 
-  // Sizes are per colour, so only offer the ones actually orderable.
-  const availableSizes = [
-    ...new Set(
+  const sizesForColour = [
+    ...new Map(
       product.variants
-        .filter(
-          (variant) => variant.available && (!color || variant.color === color),
-        )
-        .map((variant) => variant.size),
-    ),
+        .filter((variant) => !color || variant.color === color)
+        .map((variant) => [variant.size, variant]),
+    ).values(),
   ];
-  const soldOut = availableSizes.length === 0;
+  const soldOut = !product.variants.some((variant) => variant.available);
 
   return (
     <article className="group min-w-0">
@@ -43,7 +52,9 @@ export function ProductCard({ product }: { product: Product }) {
               alt=""
               fill
               sizes="(min-width: 1024px) 25vw, 50vw"
-              className="object-cover opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              className={`object-cover opacity-0 transition-opacity duration-500 ${
+                soldOut ? "group-hover:opacity-60" : "group-hover:opacity-100"
+              }`}
             />
           ) : null}
         </Link>
@@ -71,17 +82,28 @@ export function ProductCard({ product }: { product: Product }) {
                 Select size
               </p>
               <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {availableSizes.map((size) => (
+                {sizesForColour.map((option) => (
                   <button
-                    key={size}
+                    key={option.size}
                     type="button"
-                    className="min-h-8 min-w-8 border border-ink px-2 py-1 text-[10px] uppercase tracking-[0.12em] hover:bg-ink hover:text-white sm:min-h-0 sm:text-[11px]"
+                    disabled={!option.available}
+                    aria-label={
+                      option.available
+                        ? option.size
+                        : `${option.size} — sold out`
+                    }
+                    className={`min-h-8 min-w-8 border px-2 py-1 text-[10px] uppercase tracking-[0.12em] sm:min-h-0 sm:text-[11px] ${
+                      option.available
+                        ? "border-ink hover:bg-ink hover:text-white"
+                        : "cursor-not-allowed border-line text-muted/50 line-through"
+                    }`}
                     onClick={() => {
-                      addToCart({ product, color, size });
+                      if (!option.available) return;
+                      addToCart({ product, color, size: option.size });
                       setOpen(false);
                     }}
                   >
-                    {size}
+                    {option.size}
                   </button>
                 ))}
               </div>
@@ -132,11 +154,15 @@ export function ProductCard({ product }: { product: Product }) {
                   unavailable ? `${option.name} — sold out` : option.name
                 }
                 onClick={() => setColor(option.name)}
-                className={`h-5 w-5 rounded-full border sm:h-3.5 sm:w-3.5 ${
+                className={`relative h-5 w-5 overflow-hidden rounded-full border sm:h-3.5 sm:w-3.5 ${
                   color === option.name ? "border-ink" : "border-transparent"
-                } ${unavailable ? "opacity-40" : ""}`}
+                }`}
                 style={{ backgroundColor: option.hex }}
-              />
+              >
+                {unavailable ? (
+                  <span className="absolute inset-x-0 top-1/2 border-t border-ink/50" />
+                ) : null}
+              </button>
             );
           })}
         </div>

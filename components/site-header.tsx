@@ -2,13 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {
-  BagIcon,
-  CloseIcon,
-  MenuIcon,
-  SearchIcon,
-  UserIcon,
-} from "@/components/icons";
+import { BagIcon, CloseIcon, MenuIcon, SearchIcon } from "@/components/icons";
 import { useStore } from "@/components/store-provider";
 import { NavbarBackButton } from "@/components/smart-back";
 import type { Brand } from "@/lib/catalog";
@@ -64,8 +58,8 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
       </div>
 
       <div className="border-b border-line bg-ivory/95 backdrop-blur-md">
-        <div className="relative mx-auto flex h-14 max-w-7xl items-center justify-between px-3 sm:h-16 sm:px-5 lg:grid lg:grid-cols-3 lg:px-8">
-          <div className="flex items-center">
+        <div className="mx-auto grid h-14 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-3 sm:h-16 sm:px-5 lg:px-8">
+          <div className="flex min-w-0 items-center">
             <NavbarBackButton />
             <button
               type="button"
@@ -88,28 +82,20 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
             </nav>
           </div>
 
-          <Link
-            href="/"
-            className="absolute left-1/2 -translate-x-1/2 lg:static lg:justify-self-center lg:translate-x-0"
-          >
+          <Link href="/">
             <span className="sr-only">Skyvano</span>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <Image
-                src="/logo.png"
-                alt="Skyvano"
-                width={48}
-                height={48}
-                className="h-9 w-9 rounded-sm object-cover sm:h-11 sm:w-11"
-                priority
-              />
-              <span className="hidden font-serif text-2xl tracking-[0.28em] text-ink md:block">
-                SKYVANO
-              </span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Skyvano"
+              width={48}
+              height={48}
+              className="h-9 w-9 rounded-sm object-cover sm:h-11 sm:w-11"
+              priority
+            />
           </Link>
 
-          <div className="flex items-center justify-end gap-0.5 sm:gap-2">
-            <nav className="mr-1 hidden items-center gap-4 whitespace-nowrap text-[11px] uppercase tracking-[0.18em] xl:mr-2 xl:gap-6 xl:tracking-[0.22em] lg:flex">
+          <div className="flex items-center justify-end gap-2 sm:gap-3">
+            <nav className="mr-1 hidden min-w-0 items-center justify-end gap-4 overflow-hidden whitespace-nowrap text-[11px] uppercase tracking-[0.16em] xl:mr-2 xl:flex xl:gap-6 xl:tracking-[0.22em]">
               {rightNav.map((item) =>
                 item.label === "Brands" ? (
                   <div key={item.href} className="group relative">
@@ -144,6 +130,8 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
                     key={item.href}
                     href={item.href}
                     className={`transition-colors hover:text-gold ${
+                      item.label === "Best Sellers" ? "hidden 2xl:inline" : ""
+                    } ${
                       item.label === "Sale" ? "text-gold" : "text-ink/80"
                     }`}
                   >
@@ -152,34 +140,38 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
                 ),
               )}
             </nav>
-            <button
-              type="button"
-              className="flex h-11 w-11 items-center justify-center"
-              onClick={openSearch}
-              aria-label="Search"
-            >
-              <SearchIcon />
-            </button>
-            <Link
-              href="/account"
-              aria-label="Account"
-              className="hidden h-11 w-11 items-center justify-center sm:flex"
-            >
-              <UserIcon />
-            </Link>
-            <button
-              type="button"
-              onClick={openCart}
-              aria-label="Open bag"
-              className="relative flex h-11 w-11 items-center justify-center"
-            >
-              <BagIcon />
-              {cartCount > 0 ? (
-                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] text-ink">
-                  {cartCount}
+            <div className="flex shrink-0 items-center gap-0.5 xl:border-l xl:border-line xl:pl-3">
+              <button
+                type="button"
+                className="flex h-11 w-11 shrink-0 items-center justify-center"
+                onClick={openSearch}
+                aria-label="Search"
+              >
+                <SearchIcon />
+              </button>
+              <Link
+                href="/account"
+                className="hidden h-11 shrink-0 items-center whitespace-nowrap px-2 text-[11px] uppercase tracking-[0.18em] text-ink/80 transition-colors hover:text-gold lg:inline-flex"
+              >
+                Sign in
+              </Link>
+              <button
+                type="button"
+                onClick={openCart}
+                aria-label={cartCount > 0 ? `Bag, ${cartCount} items` : "Bag"}
+                className="relative flex h-11 shrink-0 items-center gap-1.5 whitespace-nowrap px-1.5 text-ink/80 transition-colors hover:text-gold"
+              >
+                <BagIcon />
+                <span className="hidden text-[11px] uppercase tracking-[0.18em] lg:inline">
+                  Bag{cartCount > 0 ? ` (${cartCount})` : ""}
                 </span>
-              ) : null}
-            </button>
+                {cartCount > 0 ? (
+                  <span className="absolute -right-0.5 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[10px] text-ink lg:hidden">
+                    {cartCount}
+                  </span>
+                ) : null}
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -225,8 +217,18 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
               ))}
             </div>
             <div className="mt-6 grid gap-3 border-t border-line pt-6 text-sm uppercase tracking-[0.2em] text-muted">
+              <button
+                type="button"
+                className="py-1 text-left"
+                onClick={() => {
+                  closeMenu();
+                  openSearch();
+                }}
+              >
+                Search
+              </button>
               <Link href="/account" onClick={closeMenu} className="py-1">
-                Account
+                Sign in
               </Link>
               <Link href="/about" onClick={closeMenu} className="py-1">
                 About

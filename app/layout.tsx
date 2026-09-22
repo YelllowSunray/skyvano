@@ -12,7 +12,7 @@ import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 // Keep in sync with CATALOG_REVALIDATE_SECONDS; Next requires a literal here.
-export const revalidate = 900;
+export const revalidate = 60;
 
 const outfit = Outfit({
   variable: "--font-outfit",

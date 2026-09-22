@@ -17,6 +17,8 @@ export type ProductVariant = {
   price: number;
   compareAtPrice?: number;
   available: boolean;
+  /** Units on the variant. Missing when Shopify withholds inventory. */
+  quantity?: number;
 };
 
 export type Product = {

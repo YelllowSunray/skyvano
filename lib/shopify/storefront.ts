@@ -71,12 +71,16 @@ export async function shopifyStorefrontGraphql<T>(
 
   const json = (await response.json()) as {
     data?: T;
-    errors?: Array<{ message: string }>;
+    errors?: Array<{
+      message: string;
+      extensions?: { code?: string; requiredAccess?: string };
+    }>;
   };
 
-  if (json.errors?.length) {
+  const blocking = json.errors?.filter((error) => !isInventoryScopeError(error));
+  if (blocking?.length) {
     throw new ShopifyStorefrontError(
-      json.errors.map((error) => error.message).join("; "),
+      blocking.map((error) => error.message).join("; "),
     );
   }
 
@@ -85,4 +89,15 @@ export async function shopifyStorefrontGraphql<T>(
   }
 
   return json.data;
+}
+
+/** Headless tokens often omit inventory; the rest of the catalogue still loads. */
+function isInventoryScopeError(error: {
+  message: string;
+  extensions?: { code?: string; requiredAccess?: string };
+}) {
+  if (error.extensions?.code !== "ACCESS_DENIED") return false;
+  return /quantityAvailable|totalInventory|product_inventory/i.test(
+    `${error.message} ${error.extensions.requiredAccess ?? ""}`,
+  );
 }

@@ -20,11 +20,19 @@ function onlyAvailableSize(variants: ProductVariant[]) {
 export function ProductDetail({ product }: { product: Product }) {
   const { addToCart } = useStore();
   const [activeImage, setActiveImage] = useState(0);
-  const [color, setColor] = useState(product.colors[0]?.name ?? "");
+  const [color, setColor] = useState(
+    product.colors.find((colour) =>
+      product.variants.some(
+        (variant) => variant.color === colour.name && variant.available,
+      ),
+    )?.name ??
+      product.colors[0]?.name ??
+      "",
+  );
   const [size, setSize] = useState(onlyAvailableSize(product.variants));
   const [error, setError] = useState("");
 
-  const soldOut = !product.variants.some((variant) => variant.available);
+  const productSoldOut = !product.variants.some((variant) => variant.available);
 
   // Sizes belong to a colour, so the option list follows the current swatch.
   const sizeOptions = useMemo(() => {
@@ -59,7 +67,19 @@ export function ProductDetail({ product }: { product: Product }) {
     else if (!forColour.some((variant) => variant.size === size)) setSize("");
   };
 
+  const selectedSoldOut = Boolean(size && selected && !selected.available);
+  const blocked = productSoldOut || selectedSoldOut;
+
+  const stockLabel = productSoldOut
+    ? "Sold out"
+    : !size
+      ? "Select a size"
+      : selectedSoldOut
+        ? "Sold out"
+        : "In stock — ships within 48 hours";
+
   const add = () => {
+    if (productSoldOut) return;
     if (!size) {
       setError("Please select a size.");
       return;
@@ -80,9 +100,22 @@ export function ProductDetail({ product }: { product: Product }) {
             alt={product.name}
             fill
             priority
-            className="object-cover"
+            className={`object-cover ${productSoldOut ? "opacity-60" : ""}`}
             sizes="(min-width: 768px) 50vw, 100vw"
           />
+          {productSoldOut ? (
+            <span className="absolute left-3 top-3 bg-white px-2 py-1 text-[10px] uppercase tracking-[0.18em]">
+              Sold out
+            </span>
+          ) : product.tags.includes("sale") ? (
+            <span className="absolute left-3 top-3 bg-ink px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-white">
+              Sale
+            </span>
+          ) : product.tags.includes("new") ? (
+            <span className="absolute left-3 top-3 bg-gold px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-ink">
+              New
+            </span>
+          ) : null}
         </div>
         <div className="mt-3 grid grid-cols-4 gap-2 sm:gap-3">
           {product.images.map((image, index) => (
@@ -148,14 +181,17 @@ export function ProductDetail({ product }: { product: Product }) {
                       unavailable ? `${option.name} — sold out` : option.name
                     }
                     onClick={() => selectColor(option.name)}
-                    className={`h-9 w-9 rounded-full border sm:h-7 sm:w-7 ${
+                    className={`relative h-9 w-9 overflow-hidden rounded-full border sm:h-7 sm:w-7 ${
                       color === option.name ? "border-ink p-0.5" : "border-line"
-                    } ${unavailable ? "opacity-40" : ""}`}
+                    }`}
                   >
                     <span
                       className="block h-full w-full rounded-full"
                       style={{ backgroundColor: option.hex }}
                     />
+                    {unavailable ? (
+                      <span className="pointer-events-none absolute inset-x-1 top-1/2 border-t border-ink/50" />
+                    ) : null}
                   </button>
                 );
               })}
@@ -170,12 +206,16 @@ export function ProductDetail({ product }: { product: Product }) {
               <button
                 key={option.size}
                 type="button"
-                disabled={!option.available}
+                aria-label={
+                  option.available ? option.size : `${option.size} — sold out`
+                }
                 onClick={() => {
                   setSize(option.size);
                   setError("");
                 }}
-                className={`min-h-11 min-w-11 border px-3 py-2 text-sm disabled:cursor-not-allowed disabled:border-line disabled:text-muted/50 disabled:line-through ${
+                className={`min-h-11 min-w-11 border px-3 py-2 text-sm ${
+                  !option.available ? "text-muted/50 line-through" : ""
+                } ${
                   size === option.size
                     ? "border-ink bg-ink text-white"
                     : "border-line hover:border-ink"
@@ -188,14 +228,14 @@ export function ProductDetail({ product }: { product: Product }) {
         </fieldset>
 
         <p className="mt-4 text-[11px] uppercase tracking-[0.18em] text-muted">
-          {soldOut ? "Sold out" : "In stock — ships within 48 hours"}
+          {stockLabel}
         </p>
 
         {error ? <p className="mt-3 text-sm text-red-700">{error}</p> : null}
 
         <div className="mt-8 hidden flex-col gap-3 sm:flex-row md:flex">
-          <Button className="flex-1" onClick={add} disabled={soldOut}>
-            {soldOut ? "Sold out" : "Add to bag"}
+          <Button className="flex-1" onClick={add} disabled={blocked}>
+            {blocked ? "Sold out" : "Add to bag"}
           </Button>
           <Button href="/shipping" variant="outline" className="flex-1">
             Shipping & returns
@@ -214,13 +254,13 @@ export function ProductDetail({ product }: { product: Product }) {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm">{formatPrice(price)}</p>
             <p className="truncate text-[11px] text-muted">
-              {soldOut
+              {blocked
                 ? "Sold out"
                 : [color, size].filter(Boolean).join(" / ") || "Select a size"}
             </p>
           </div>
-          <Button className="shrink-0" onClick={add} disabled={soldOut}>
-            {soldOut ? "Sold out" : "Add to bag"}
+          <Button className="shrink-0" onClick={add} disabled={blocked}>
+            {blocked ? "Sold out" : "Add to bag"}
           </Button>
         </div>
       </div>
