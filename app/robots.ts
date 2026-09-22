@@ -6,9 +6,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // The bag and account are per-shopper, and filtered or searched URLs are
+      // The bag is per-shopper, and filtered or searched URLs are
       // endless combinations of the same products.
-      disallow: ["/cart", "/account", "/search", "/api/"],
+      disallow: ["/cart", "/search", "/api/"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

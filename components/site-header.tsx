@@ -149,12 +149,6 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
               >
                 <SearchIcon />
               </button>
-              <Link
-                href="/account"
-                className="hidden h-11 shrink-0 items-center whitespace-nowrap px-2 text-[11px] uppercase tracking-[0.18em] text-ink/80 transition-colors hover:text-gold lg:inline-flex"
-              >
-                Sign in
-              </Link>
               <button
                 type="button"
                 onClick={openCart}
@@ -227,9 +221,6 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
               >
                 Search
               </button>
-              <Link href="/account" onClick={closeMenu} className="py-1">
-                Sign in
-              </Link>
               <Link href="/about" onClick={closeMenu} className="py-1">
                 About
               </Link>

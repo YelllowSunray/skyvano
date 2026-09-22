@@ -114,18 +114,39 @@ function buildBrands(products: Product[]): Brand[] {
   return [...brands.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 
+function emptyCatalog(): Catalog {
+  return {
+    products: [],
+    bySlug: new Map(),
+    bestSellers: [],
+    brands: [],
+    search: buildSearchIndex([]),
+  };
+}
+
 const loadCatalog = cache(async (): Promise<Catalog> => {
   if (!isShopifyReady()) {
-    throw new Error(
+    console.error(
       `Shopify is not configured. Missing: ${shopifyMissingKeys().join(", ")}`,
     );
+    return emptyCatalog();
   }
 
-  const [nodes, bestSellingHandles, adminQuantities] = await Promise.all([
-    fetchAllProducts(),
-    fetchBestSellingHandles(),
-    fetchAdminVariantQuantities(),
-  ]);
+  let nodes: ShopifyProductNode[];
+  let bestSellingHandles: string[];
+  let adminQuantities: Map<string, number> | null;
+
+  try {
+    [nodes, bestSellingHandles, adminQuantities] = await Promise.all([
+      fetchAllProducts(),
+      fetchBestSellingHandles(),
+      fetchAdminVariantQuantities(),
+    ]);
+  } catch (error) {
+    // Frozen/unpaid shops 404 the Storefront API. Keep the site up.
+    console.error("Shopify catalog unavailable", error);
+    return emptyCatalog();
+  }
 
   const mapped: MappedProduct[] = applyInventoryQuantities(
     nodes

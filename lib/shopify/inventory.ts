@@ -43,7 +43,7 @@ export async function fetchAdminVariantQuantities() {
     let cursor: string | null = null;
 
     do {
-      const data = await shopifyAdminGraphql<AdminInventoryResponse>(
+      const data: AdminInventoryResponse = await shopifyAdminGraphql<AdminInventoryResponse>(
         ADMIN_INVENTORY_QUERY,
         { cursor },
       );
