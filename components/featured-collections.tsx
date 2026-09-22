@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getCollectionPreviews } from "@/lib/catalog";
 
 export async function FeaturedCollections() {
-  const featured = await getCollectionPreviews(["women", "men", "accessories"]);
+  const featured = await getCollectionPreviews(["women", "men"]);
   const visible = featured.filter((collection) => collection.count > 0);
   if (visible.length === 0) return null;
 
@@ -17,7 +17,7 @@ export async function FeaturedCollections() {
           Featured collections
         </h2>
       </div>
-      <div className="mx-auto grid max-w-7xl gap-3 sm:gap-4 md:grid-cols-3">
+      <div className="mx-auto grid max-w-7xl gap-3 sm:gap-4 md:grid-cols-2">
         {visible.map((collection) => (
           <Link
             key={collection.slug}
@@ -30,7 +30,7 @@ export async function FeaturedCollections() {
                 alt={collection.title}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes="(min-width: 768px) 33vw, 100vw"
+                sizes="(min-width: 768px) 50vw, 100vw"
               />
             ) : null}
             {/* Product shots have pale backdrops, so the label needs a scrim. */}

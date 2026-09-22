@@ -6,22 +6,15 @@ import { BagIcon, CloseIcon, MenuIcon, SearchIcon } from "@/components/icons";
 import { Marquee } from "@/components/marquee";
 import { useStore } from "@/components/store-provider";
 import { NavbarBackButton } from "@/components/smart-back";
-import type { Brand } from "@/lib/catalog";
+import type { Brand, GenderNav } from "@/lib/catalog";
 
-const leftNav = [
-  { href: "/collections/new-arrivals", label: "New Arrivals" },
-  { href: "/collections/women", label: "Women" },
-  { href: "/collections/men", label: "Men" },
-];
+const leftPlain = [{ href: "/collections/new-arrivals", label: "New Arrivals" }];
 
 const rightNav = [
   { href: "/brands", label: "Brands" },
-  { href: "/collections/accessories", label: "Accessories" },
   { href: "/collections/best-sellers", label: "Best Sellers" },
   { href: "/collections/sale", label: "Sale" },
 ];
-
-const nav = [...leftNav, ...rightNav];
 
 const messages = [
   "Complimentary European shipping on orders over €150",
@@ -29,7 +22,63 @@ const messages = [
   "Easy returns within 30 days",
 ];
 
-export function SiteHeader({ brands }: { brands: Brand[] }) {
+function GenderColumns({
+  item,
+  onNavigate,
+}: {
+  item: GenderNav;
+  onNavigate?: () => void;
+}) {
+  return (
+    <>
+      {item.departments.map((department) => {
+        const wide = department.categories.length > 8;
+        return (
+          <div
+            key={department.slug}
+            className={wide ? "lg:col-span-2" : undefined}
+          >
+            <Link
+              href={`${item.href}?department=${department.slug}`}
+              onClick={onNavigate}
+              className="font-serif text-2xl tracking-wide text-ink transition-colors hover:text-gold"
+            >
+              {department.name}
+            </Link>
+            <ul className={`mt-4 ${wide ? "lg:columns-2 lg:gap-x-10" : ""}`}>
+              {department.categories.map((category) => (
+                <li key={category.slug} className="break-inside-avoid">
+                  <Link
+                    href={`${item.href}?category=${category.slug}`}
+                    onClick={onNavigate}
+                    className="block py-1 text-sm text-muted transition-colors hover:text-gold"
+                  >
+                    {category.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link
+              href={`${item.href}?department=${department.slug}`}
+              onClick={onNavigate}
+              className="mt-4 inline-block text-[11px] uppercase tracking-[0.18em] text-gold"
+            >
+              View all
+            </Link>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+export function SiteHeader({
+  brands,
+  genderNav,
+}: {
+  brands: Brand[];
+  genderNav: GenderNav[];
+}) {
   const {
     cartCount,
     openCart,
@@ -52,7 +101,7 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
         ))}
       </Marquee>
 
-      <div className="border-b border-line bg-ivory/95 backdrop-blur-md">
+      <div className="relative border-b border-line bg-ivory/95 backdrop-blur-md">
         <div className="mx-auto grid h-14 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-3 sm:h-16 sm:px-5 lg:px-8">
           <div className="flex min-w-0 items-center">
             <NavbarBackButton />
@@ -65,7 +114,7 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
               <MenuIcon />
             </button>
             <nav className="hidden items-center gap-4 whitespace-nowrap text-[11px] uppercase tracking-[0.18em] xl:gap-6 xl:tracking-[0.22em] lg:flex">
-              {leftNav.map((item) => (
+              {leftPlain.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -74,6 +123,56 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
                   {item.label}
                 </Link>
               ))}
+              {genderNav.map((item) => {
+                const feature = item.departments.find(
+                  (department) => department.image,
+                );
+                return (
+                  <div key={item.href} className="group">
+                    <Link
+                      href={item.href}
+                      className="inline-flex h-16 items-center text-ink/80 transition-colors hover:text-gold group-hover:text-gold group-hover:underline group-hover:decoration-gold/50 group-hover:underline-offset-[14px]"
+                    >
+                      {item.label}
+                    </Link>
+                    {item.departments.length > 0 ? (
+                      <div className="pointer-events-none invisible absolute inset-x-0 top-full z-50 origin-top opacity-0 transition duration-200 ease-out group-hover:pointer-events-auto group-hover:visible group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:opacity-100">
+                        <div className="border-t border-line bg-ivory shadow-[0_24px_48px_rgba(17,17,17,0.08)]">
+                          <div className="mx-auto max-w-7xl px-8 py-9">
+                            <div className="grid grid-cols-4 items-start gap-x-10 gap-y-8 xl:grid-cols-5">
+                              <GenderColumns item={item} />
+                              {feature?.image ? (
+                                <Link
+                                  href={`${item.href}?all=1`}
+                                  className="group/feature relative hidden aspect-[4/5] max-h-80 overflow-hidden bg-cream xl:block"
+                                >
+                                  <Image
+                                    src={feature.image}
+                                    alt={`${item.label} edit`}
+                                    fill
+                                    className="object-cover transition-transform duration-700 group-hover/feature:scale-105"
+                                    sizes="16rem"
+                                  />
+                                  <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/15 to-transparent" />
+                                  <span className="absolute inset-x-0 bottom-0 p-5 text-[11px] uppercase tracking-[0.2em] text-white">
+                                    Shop all {item.label.toLowerCase()}
+                                  </span>
+                                </Link>
+                              ) : null}
+                            </div>
+                            <Link
+                              href={`${item.href}?all=1`}
+                              className="mt-8 inline-block text-[11px] uppercase tracking-[0.2em] text-gold xl:hidden"
+                            >
+                              Shop all {item.label.toLowerCase()}
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
             </nav>
           </div>
 
@@ -181,7 +280,39 @@ export function SiteHeader({ brands }: { brands: Brand[] }) {
             </button>
           </div>
           <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-5 py-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
-            {nav.map((item) => (
+            <Link
+              href="/collections/new-arrivals"
+              onClick={closeMenu}
+              className="py-2 font-serif text-3xl tracking-wide sm:text-4xl"
+            >
+              New Arrivals
+            </Link>
+            {genderNav.map((item) => (
+              <details key={item.href} className="group">
+                <summary className="flex cursor-pointer list-none items-baseline justify-between py-2 font-serif text-3xl tracking-wide sm:text-4xl [&::-webkit-details-marker]:hidden">
+                  {item.label}
+                  <span className="font-sans text-lg text-gold group-open:hidden">
+                    +
+                  </span>
+                  <span className="hidden font-sans text-lg text-gold group-open:inline">
+                    −
+                  </span>
+                </summary>
+                <div className="space-y-8 border-b border-line pb-6">
+                  <Link
+                    href={`${item.href}?all=1`}
+                    onClick={closeMenu}
+                    className="inline-block text-[11px] uppercase tracking-[0.18em] text-gold"
+                  >
+                    Shop all {item.label.toLowerCase()}
+                  </Link>
+                  <div className="grid gap-8">
+                    <GenderColumns item={item} onNavigate={closeMenu} />
+                  </div>
+                </div>
+              </details>
+            ))}
+            {rightNav.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

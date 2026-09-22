@@ -9,7 +9,6 @@ const shopLinks = [
   ["Women", "/collections/women"],
   ["Men", "/collections/men"],
   ["Brands", "/brands"],
-  ["Accessories", "/collections/accessories"],
   ["Best Sellers", "/collections/best-sellers"],
   ["Sale", "/collections/sale"],
 ];

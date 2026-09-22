@@ -6,6 +6,7 @@ import {
   getCollection,
   type CollectionSlug,
   type Department,
+  type Gender,
   type Product,
 } from "@/lib/products";
 import { isShopifyReady, shopifyMissingKeys } from "@/lib/shopify/config";
@@ -35,6 +36,33 @@ export type Brand = {
   slug: string;
   count: number;
   image?: string;
+};
+
+export const DEPARTMENT_LABEL: Record<Department, string> = {
+  clothing: "Clothing",
+  shoes: "Shoes",
+  accessories: "Accessories",
+};
+
+export type NavCategory = {
+  slug: string;
+  name: string;
+  count: number;
+};
+
+export type NavDepartment = {
+  slug: Department;
+  name: string;
+  count: number;
+  image?: string;
+  categories: NavCategory[];
+};
+
+export type GenderNav = {
+  gender: Gender;
+  href: string;
+  label: string;
+  departments: NavDepartment[];
 };
 
 type Catalog = {
@@ -300,6 +328,55 @@ export async function getProductsByCollection(slug: CollectionSlug) {
     case "sale":
       return products.filter((product) => product.compareAtPrice !== undefined);
   }
+}
+
+export async function getGenderNavigation(): Promise<GenderNav[]> {
+  const { products } = await loadCatalog();
+
+  return (["women", "men"] as const).map((gender) => {
+    const items = products.filter((product) => product.gender === gender);
+    const byDept = new Map<Department, Map<string, number>>();
+
+    for (const product of items) {
+      const name = product.subcategory.trim();
+      if (!name) continue;
+      const counts = byDept.get(product.department) ?? new Map<string, number>();
+      counts.set(name, (counts.get(name) ?? 0) + 1);
+      byDept.set(product.department, counts);
+    }
+
+    const departments: NavDepartment[] = [];
+    const usedImages = new Set<string>();
+    for (const slug of ["clothing", "shoes", "accessories"] as Department[]) {
+      const counts = byDept.get(slug);
+      if (!counts || counts.size === 0) continue;
+      const deptItems = items.filter((product) => product.department === slug);
+      const image = preferAvailable(deptItems)
+        .flatMap((product) => product.images)
+        .find((candidate) => !usedImages.has(candidate));
+      if (image) usedImages.add(image);
+      departments.push({
+        slug,
+        name: DEPARTMENT_LABEL[slug],
+        count: deptItems.length,
+        image,
+        categories: [...counts]
+          .map(([name, count]) => ({
+            slug: brandToSlug(name),
+            name,
+            count,
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name)),
+      });
+    }
+
+    return {
+      gender,
+      href: `/collections/${gender}`,
+      label: gender === "women" ? "Women" : "Men",
+      departments,
+    };
+  });
 }
 
 export async function getBrands() {

@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { StoreProvider } from "@/components/store-provider";
 import { Toast } from "@/components/toast";
-import { getBrands } from "@/lib/catalog";
+import { getBrands, getGenderNavigation } from "@/lib/catalog";
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE } from "@/lib/seo";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
@@ -66,7 +66,10 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
-  const brands = await getBrands();
+  const [brands, genderNav] = await Promise.all([
+    getBrands(),
+    getGenderNavigation(),
+  ]);
   // The empty search panel offers the best-stocked houses as a starting point.
   const searchBrands = [...brands]
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
@@ -81,7 +84,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-dvh flex-col overflow-x-clip bg-cream font-sans text-ink">
         <StoreProvider>
           <ClientCleanup />
-          <SiteHeader brands={brands} />
+          <SiteHeader brands={brands} genderNav={genderNav} />
           <main className="flex-1">{children}</main>
           <SiteFooter />
           <CartDrawer />

@@ -14,7 +14,6 @@ const CATEGORY_LINKS = [
   { href: "/collections/new-arrivals", label: "New Arrivals" },
   { href: "/collections/women", label: "Women" },
   { href: "/collections/men", label: "Men" },
-  { href: "/collections/accessories", label: "Accessories" },
   { href: "/collections/sale", label: "Sale" },
 ];
 
