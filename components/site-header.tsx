@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { BagIcon, CloseIcon, MenuIcon, SearchIcon } from "@/components/icons";
+import { usePathname } from "next/navigation";
+import { BagIcon, CloseIcon, HomeIcon, MenuIcon, SearchIcon } from "@/components/icons";
 import { Marquee } from "@/components/marquee";
 import { useStore } from "@/components/store-provider";
 import { NavbarBackButton } from "@/components/smart-back";
@@ -87,6 +88,7 @@ export function SiteHeader({
     openMenu,
     closeMenu,
   } = useStore();
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-50">
@@ -113,6 +115,15 @@ export function SiteHeader({
             >
               <MenuIcon />
             </button>
+            {pathname !== "/" ? (
+              <Link
+                href="/"
+                className="flex h-11 w-11 items-center justify-center text-ink lg:hidden"
+                aria-label="Home"
+              >
+                <HomeIcon />
+              </Link>
+            ) : null}
             <nav className="hidden items-center gap-4 whitespace-nowrap text-[11px] uppercase tracking-[0.18em] xl:gap-6 xl:tracking-[0.22em] lg:flex">
               {leftPlain.map((item) => (
                 <Link

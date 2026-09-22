@@ -80,6 +80,22 @@ export function MenuIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function HomeIcon({ className = "h-5 w-5" }: IconProps) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M4 11.5 12 5l8 6.5" />
+      <path d="M6.5 10.5V19h11v-8.5" />
+    </svg>
+  );
+}
+
 export function BackIcon({ className = "h-5 w-5" }: IconProps) {
   return (
     <svg
