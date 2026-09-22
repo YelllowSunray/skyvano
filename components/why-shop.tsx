@@ -7,7 +7,7 @@ const reasons = [
   },
   {
     title: "Secure payments",
-    text: "Encrypted checkout with Visa, Mastercard, Apple Pay, iDEAL and Klarna.",
+    text: "Encrypted checkout with iDEAL, cards, Apple Pay, Google Pay, Shop Pay, Klarna and PayPal.",
   },
   {
     title: "Fast European delivery",

@@ -8,6 +8,7 @@ import { PageIntro } from "@/components/page-intro";
 import { ShippingProgress } from "@/components/shipping-progress";
 import { useStore } from "@/components/store-provider";
 import { formatPrice } from "@/lib/format";
+import { PAYMENT_METHODS_COPY } from "@/lib/payments";
 
 export default function CartPage() {
   const { cart, cartTotal, updateQuantity, removeFromCart } = useStore();
@@ -186,8 +187,7 @@ export default function CartPage() {
               {pending ? "Preparing checkout…" : "Checkout"}
             </Button>
             <p className="mt-4 text-xs leading-5 text-muted">
-              Payment is handled securely by Shopify. Visa, Mastercard, Amex,
-              Apple Pay, iDEAL and Klarna.
+              Payment is handled securely by Shopify. {PAYMENT_METHODS_COPY}.
             </p>
           </aside>
         </div>

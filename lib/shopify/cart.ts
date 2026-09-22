@@ -113,7 +113,7 @@ export async function createShopifyCheckout(
       reason: "unavailable",
       message:
         short.length === requested.size
-          ? "These pieces have stock. Shopify still will not take payment until the warehouse can fulfil web orders. In Admin: Settings → Locations → open the location that holds the units → turn on Fulfil online orders from this location → Save, then checkout again."
+          ? "These pieces have stock at Sync2Fashion, not Tegelseweg. Shopify will not take payment until that dropshipping location can fulfil NL web orders. Close Venlo, then Settings → Locations → Sync2Fashion — or open the product → Inventory and check which location holds the units."
           : "Shopify rejected some pieces in the bag. Remove them to continue.",
       variantIds: short.map(([variantId]) => variantId),
     };

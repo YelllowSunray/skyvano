@@ -29,7 +29,7 @@ const faqs = [
   },
   {
     q: "Which payment methods do you accept?",
-    a: "Visa, Mastercard, American Express, Apple Pay, iDEAL and Klarna. All payments are processed through a secure, encrypted checkout.",
+    a: "iDEAL, Visa, Mastercard, American Express, Apple Pay, Google Pay, Shop Pay, Klarna and PayPal. All payments are processed through Shopify's encrypted checkout.",
   },
   {
     q: "Can I change or cancel an order?",

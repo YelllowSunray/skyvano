@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { InstagramIcon, PinterestIcon, TikTokIcon } from "@/components/icons";
 import { NewsletterForm } from "@/components/newsletter-form";
+import { PAYMENT_METHODS } from "@/lib/payments";
 
 const shopLinks = [
   ["New Arrivals", "/collections/new-arrivals"],
@@ -124,7 +125,7 @@ export function SiteFooter() {
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 text-xs text-white/50 md:flex-row md:items-center md:justify-between md:px-8">
           <p>© {new Date().getFullYear()} Skyvano. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {["Visa", "Mastercard", "Amex", "Apple Pay", "iDEAL", "Klarna"].map(
+            {PAYMENT_METHODS.map(
               (method) => (
                 <span
                   key={method}
