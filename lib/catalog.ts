@@ -191,13 +191,22 @@ export async function getProduct(slug: string) {
 }
 
 export async function getNewArrivals(limit = 8) {
-  return (await loadCatalog()).products.slice(0, limit);
+  return (await loadCatalog()).products
+    .filter((product) => product.available)
+    .slice(0, limit);
 }
 
-export async function getBestSellers(limit = BEST_SELLING_COUNT) {
+export async function getBestSellers(
+  limit = BEST_SELLING_COUNT,
+  options?: { inStockOnly?: boolean },
+) {
   const { bestSellers, products } = await loadCatalog();
   // A store with no order history yet returns no ranking.
-  return (bestSellers.length > 0 ? bestSellers : products).slice(0, limit);
+  const ranked = bestSellers.length > 0 ? bestSellers : products;
+  const source = options?.inStockOnly
+    ? ranked.filter((product) => product.available)
+    : ranked;
+  return source.slice(0, limit);
 }
 
 /** Gender collections lead with clothing so they don't read as accessory pages. */

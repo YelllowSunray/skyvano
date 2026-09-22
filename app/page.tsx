@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const bestSellers = await getBestSellers(12);
+  const bestSellers = await getBestSellers(12, { inStockOnly: true });
 
   return (
     <>
