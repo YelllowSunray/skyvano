@@ -7,9 +7,10 @@ import { HouseMarquee } from "@/components/house-marquee";
 import { JsonLd } from "@/components/json-ld";
 import { NewArrivals } from "@/components/new-arrivals";
 import { NewsletterSection } from "@/components/newsletter-section";
+import { OnSale } from "@/components/on-sale";
 import { ShopByBrand } from "@/components/shop-by-brand";
 import { WhyShop } from "@/components/why-shop";
-import { getBestSellers } from "@/lib/catalog";
+import { getBestSellers, getNewArrivals, getOnSale } from "@/lib/catalog";
 import {
   DEFAULT_DESCRIPTION,
   DEFAULT_TITLE,
@@ -28,7 +29,15 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const bestSellers = await getBestSellers(12, { inStockOnly: true });
+  const newArrivals = await getNewArrivals(8);
+  const taken = newArrivals.map((product) => product.id);
+  const bestSellers = await getBestSellers(12, {
+    inStockOnly: true,
+    excludeIds: taken,
+  });
+  const onSale = await getOnSale(8, {
+    excludeIds: [...taken, ...bestSellers.map((product) => product.id)],
+  });
 
   return (
     <>
@@ -67,8 +76,9 @@ export default async function Home() {
       <HouseMarquee />
       <FeaturedCollections />
       <ShopByBrand />
-      <NewArrivals />
+      <NewArrivals products={newArrivals} />
       <BestSellers products={bestSellers} />
+      <OnSale products={onSale} />
       <BrandStory />
       <WhyShop />
       <NewsletterSection />

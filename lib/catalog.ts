@@ -196,17 +196,80 @@ export async function getNewArrivals(limit = 8) {
     .slice(0, limit);
 }
 
+function looksLikeNewest(ranked: Product[], newest: Product[]) {
+  const count = Math.min(8, ranked.length, newest.length);
+  return (
+    count === 0 ||
+    ranked.slice(0, count).every((product, index) => product.id === newest[index]?.id)
+  );
+}
+
+/** Older pieces, one brand first — used until Shopify has a real sales rank. */
+function pickEstablished(products: Product[], limit: number, excludeIds?: Set<string>) {
+  const rest = products.filter((product) => !excludeIds?.has(product.id));
+  const established = products.filter(
+    (product, index) => index >= NEWEST_COUNT && !excludeIds?.has(product.id),
+  );
+  const pool = established.length >= limit ? established : rest;
+  const picked: Product[] = [];
+  const brands = new Set<string>();
+
+  for (const product of pool) {
+    if (picked.length >= limit) return picked;
+    if (brands.has(product.brand)) continue;
+    brands.add(product.brand);
+    picked.push(product);
+  }
+  for (const product of pool) {
+    if (picked.length >= limit) return picked;
+    if (picked.some((item) => item.id === product.id)) continue;
+    picked.push(product);
+  }
+  return picked;
+}
+
 export async function getBestSellers(
   limit = BEST_SELLING_COUNT,
-  options?: { inStockOnly?: boolean },
+  options?: { inStockOnly?: boolean; excludeIds?: Iterable<string> },
 ) {
   const { bestSellers, products } = await loadCatalog();
-  // A store with no order history yet returns no ranking.
-  const ranked = bestSellers.length > 0 ? bestSellers : products;
-  const source = options?.inStockOnly
-    ? ranked.filter((product) => product.available)
-    : ranked;
-  return source.slice(0, limit);
+  const excludeIds = options?.excludeIds
+    ? new Set(options.excludeIds)
+    : undefined;
+  const usable = options?.inStockOnly
+    ? (product: Product) => product.available
+    : () => true;
+
+  const ranked = bestSellers.filter(usable);
+  const newest = products.filter(usable);
+
+  // No orders yet: Shopify's BEST_SELLING list is just "newest", so the two
+  // homepage rows would be identical. Pull a different edit instead.
+  if (looksLikeNewest(ranked, newest)) {
+    return pickEstablished(newest, limit, excludeIds);
+  }
+
+  return ranked
+    .filter((product) => !excludeIds?.has(product.id))
+    .slice(0, limit);
+}
+
+export async function getOnSale(
+  limit = 8,
+  options?: { excludeIds?: Iterable<string> },
+) {
+  const excludeIds = options?.excludeIds
+    ? new Set(options.excludeIds)
+    : undefined;
+
+  return (await loadCatalog()).products
+    .filter(
+      (product) =>
+        product.available &&
+        product.compareAtPrice !== undefined &&
+        !excludeIds?.has(product.id),
+    )
+    .slice(0, limit);
 }
 
 /** Gender collections lead with clothing so they don't read as accessory pages. */
