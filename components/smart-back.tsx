@@ -91,7 +91,7 @@ export function NavbarBackButton() {
     <button
       type="button"
       onClick={goBack}
-      className="flex h-11 w-11 items-center justify-center text-ink lg:hidden"
+      className="flex h-11 w-11 items-center justify-center text-ink transition-colors hover:text-gold"
       aria-label={label}
     >
       <BackIcon className="h-5 w-5" />

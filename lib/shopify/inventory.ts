@@ -65,7 +65,10 @@ export async function fetchAdminVariantQuantities() {
   }
 }
 
-/** Sold-out follows unit count: 0 is sold out, anything above is buyable. */
+/**
+ * Admin units are the on-hand count. They do not override Shopify when a
+ * variant is still for sale at 0 (untracked or continue-selling).
+ */
 export function applyInventoryQuantities(
   products: Product[],
   adminQuantities?: Map<string, number> | null,
@@ -76,7 +79,8 @@ export function applyInventoryQuantities(
       return {
         ...variant,
         ...(quantity == null ? {} : { quantity }),
-        available: quantity == null ? variant.available : quantity > 0,
+        available:
+          variant.available || (quantity != null && quantity > 0),
       };
     });
     return {

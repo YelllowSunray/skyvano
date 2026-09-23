@@ -255,10 +255,10 @@ export function mapShopifyProduct(node: ShopifyProductNode): MappedProduct {
         variant.quantityAvailable == null
           ? undefined
           : variant.quantityAvailable,
+      // Dropshipped pieces often sit at 0 units but remain buyable.
       available:
-        variant.quantityAvailable == null
-          ? variant.availableForSale
-          : variant.quantityAvailable > 0,
+        variant.availableForSale ||
+        (variant.quantityAvailable != null && variant.quantityAvailable > 0),
     };
   });
 

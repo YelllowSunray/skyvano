@@ -107,6 +107,15 @@ export function SiteHeader({
         <div className="mx-auto grid h-14 max-w-7xl grid-cols-[1fr_auto_1fr] items-center px-3 sm:h-16 sm:px-5 lg:px-8">
           <div className="flex min-w-0 items-center">
             <NavbarBackButton />
+            {pathname !== "/" ? (
+              <Link
+                href="/"
+                className="flex h-11 w-11 items-center justify-center text-ink transition-colors hover:text-gold"
+                aria-label="Home"
+              >
+                <HomeIcon />
+              </Link>
+            ) : null}
             <button
               type="button"
               className="flex h-11 w-11 items-center justify-center lg:hidden"
@@ -115,15 +124,6 @@ export function SiteHeader({
             >
               <MenuIcon />
             </button>
-            {pathname !== "/" ? (
-              <Link
-                href="/"
-                className="flex h-11 w-11 items-center justify-center text-ink lg:hidden"
-                aria-label="Home"
-              >
-                <HomeIcon />
-              </Link>
-            ) : null}
             <nav className="hidden items-center gap-4 whitespace-nowrap text-[11px] uppercase tracking-[0.18em] xl:gap-6 xl:tracking-[0.22em] lg:flex">
               {leftPlain.map((item) => (
                 <Link

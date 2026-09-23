@@ -4,12 +4,24 @@ import { Button } from "@/components/button";
 export function Hero() {
   return (
     <section className="relative h-[70svh] min-h-[420px] w-full overflow-hidden sm:h-[78vh] sm:min-h-[520px]">
+      <video
+        className="absolute inset-0 h-full w-full object-cover object-center motion-reduce:hidden"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        poster="/hero.jpg"
+        aria-hidden="true"
+      >
+        <source src="/hero.mp4" type="video/mp4" />
+      </video>
       <Image
-        src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=2000&q=80"
-        alt="Skyvano campaign"
+        src="/hero.jpg"
+        alt=""
         fill
         priority
-        className="object-cover object-[center_20%]"
+        className="hidden object-cover object-center motion-reduce:block"
         sizes="100vw"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-ink/75 via-ink/25 to-ink/10" />

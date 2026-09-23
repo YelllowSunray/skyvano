@@ -32,7 +32,6 @@ export default async function Home() {
   const newArrivals = await getNewArrivals(8);
   const taken = newArrivals.map((product) => product.id);
   const bestSellers = await getBestSellers(12, {
-    inStockOnly: true,
     excludeIds: taken,
   });
   const onSale = await getOnSale(8, {
