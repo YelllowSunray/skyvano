@@ -26,13 +26,6 @@ export function Hero() {
       />
       <div className="absolute inset-0 bg-gradient-to-t from-ink/75 via-ink/25 to-ink/10" />
       <div className="relative flex h-full flex-col items-center justify-center px-5 text-center text-white">
-        <Image
-          src="/logo.png"
-          alt=""
-          width={92}
-          height={92}
-          className="mb-4 h-14 w-14 object-contain sm:mb-6 sm:h-20 sm:w-20"
-        />
         <h1 className="font-serif text-[12vw] leading-none tracking-[0.14em] sm:text-6xl sm:tracking-[0.18em] md:text-8xl">
           SKYVANO
         </h1>
