@@ -190,7 +190,7 @@ export function SiteHeader({
           <Link href="/">
             <span className="sr-only">Skyvano</span>
             <Image
-              src="/logo.png"
+              src="/logo-mark.jpg"
               alt="Skyvano"
               width={48}
               height={48}
