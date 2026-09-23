@@ -187,18 +187,21 @@ const loadCatalog = cache(async (): Promise<Catalog> => {
     bestSellingHandles.map((handle, index) => [handle, index]),
   );
 
-  // Shopify already returned newest first, so position stands in for recency.
-  const products: Product[] = mapped.map((product, index) => {
-    const tags = [...product.tags];
-    if (index < NEWEST_COUNT) tags.push("new");
-    if (bestSellingRank.has(product.slug)) tags.push("bestseller");
-    return { ...product, tags };
-  });
+  // Sold-out pieces stay addressable by URL but never appear in listings.
+  const bySlug = new Map(mapped.map((product) => [product.slug, product]));
 
-  const bySlug = new Map(products.map((product) => [product.slug, product]));
+  // Shopify already returned newest first, so position stands in for recency.
+  const products: Product[] = mapped
+    .filter((product) => product.available)
+    .map((product, index) => {
+      const tags = [...product.tags];
+      if (index < NEWEST_COUNT) tags.push("new");
+      if (bestSellingRank.has(product.slug)) tags.push("bestseller");
+      return { ...product, tags };
+    });
 
   const bestSellers = [...bestSellingRank.keys()]
-    .map((handle) => bySlug.get(handle))
+    .map((handle) => products.find((product) => product.slug === handle))
     .filter((product): product is Product => Boolean(product));
 
   return {
@@ -218,34 +221,8 @@ export async function getProduct(slug: string) {
   return (await loadCatalog()).bySlug.get(slug);
 }
 
-function fillShelf(
-  preferred: Product[],
-  fallback: Product[],
-  limit: number,
-  excludeIds?: Set<string>,
-) {
-  const seen = new Set(excludeIds);
-  const items: Product[] = [];
-
-  for (const pool of [preferred, fallback]) {
-    for (const product of pool) {
-      if (items.length >= limit) return items;
-      if (seen.has(product.id)) continue;
-      seen.add(product.id);
-      items.push(product);
-    }
-  }
-
-  return items;
-}
-
 export async function getNewArrivals(limit = 8) {
-  const products = (await loadCatalog()).products;
-  return fillShelf(
-    products.filter((product) => product.available),
-    products,
-    limit,
-  );
+  return (await loadCatalog()).products.slice(0, limit);
 }
 
 function looksLikeNewest(ranked: Product[], newest: Product[]) {
@@ -282,30 +259,22 @@ function pickEstablished(products: Product[], limit: number, excludeIds?: Set<st
 
 export async function getBestSellers(
   limit = BEST_SELLING_COUNT,
-  options?: { inStockOnly?: boolean; excludeIds?: Iterable<string> },
+  options?: { excludeIds?: Iterable<string> },
 ) {
   const { bestSellers, products } = await loadCatalog();
   const excludeIds = options?.excludeIds
     ? new Set(options.excludeIds)
     : undefined;
-  const usable = options?.inStockOnly
-    ? (product: Product) => product.available
-    : () => true;
-
-  const ranked = bestSellers.filter(usable);
-  const newest = products.filter(usable);
 
   // No orders yet: Shopify's BEST_SELLING list is just "newest", so the two
   // homepage rows would be identical. Pull a different edit instead.
-  const primary = looksLikeNewest(ranked, newest)
-    ? pickEstablished(newest, limit, excludeIds)
-    : ranked
-        .filter((product) => !excludeIds?.has(product.id))
-        .slice(0, limit);
+  if (looksLikeNewest(bestSellers, products)) {
+    return pickEstablished(products, limit, excludeIds);
+  }
 
-  if (primary.length >= limit || options?.inStockOnly) return primary;
-
-  return fillShelf(primary, products, limit, excludeIds);
+  return bestSellers
+    .filter((product) => !excludeIds?.has(product.id))
+    .slice(0, limit);
 }
 
 export async function getOnSale(
@@ -316,17 +285,13 @@ export async function getOnSale(
     ? new Set(options.excludeIds)
     : undefined;
 
-  const products = (await loadCatalog()).products.filter(
-    (product) => product.compareAtPrice !== undefined,
-  );
-
-  return fillShelf(
-    products.filter(
-      (product) => product.available && !excludeIds?.has(product.id),
-    ),
-    products.filter((product) => !excludeIds?.has(product.id)),
-    limit,
-  );
+  return (await loadCatalog()).products
+    .filter(
+      (product) =>
+        product.compareAtPrice !== undefined &&
+        !excludeIds?.has(product.id),
+    )
+    .slice(0, limit);
 }
 
 /** Gender collections lead with clothing so they don't read as accessory pages. */
