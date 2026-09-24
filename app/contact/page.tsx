@@ -19,9 +19,6 @@ export default function ContactPage() {
       <div className="grid gap-12 md:grid-cols-2">
         <div className="text-sm leading-7 text-muted">
           <p className="font-serif text-3xl text-ink">{COMPANY.legalName}</p>
-          <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-gold">
-            Trading as {COMPANY.brandName}
-          </p>
           <div className="mt-4">
             {companyAddressLines().map((line) => (
               <p key={line}>{line}</p>
