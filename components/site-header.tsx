@@ -405,18 +405,6 @@ export function SiteHeader({
                 {item.label}
               </Link>
             ))}
-            <div className="mt-4 grid gap-1 pb-2">
-              {brands.map((brand) => (
-                <Link
-                  key={brand.slug}
-                  href={`/brands/${brand.slug}`}
-                  onClick={closeMenu}
-                  className="py-1.5 text-sm uppercase tracking-[0.18em] text-muted"
-                >
-                  {brand.name}
-                </Link>
-              ))}
-            </div>
             <div className="mt-6 grid gap-3 border-t border-line pt-6 text-sm uppercase tracking-[0.2em] text-muted">
               <button
                 type="button"
