@@ -53,6 +53,28 @@ export const ALL_PRODUCTS_QUERY = /* GraphQL */ `
   }
 `;
 
+/** Same payload as AllProducts, narrowed by Shopify's product search query. */
+export const SEARCHED_PRODUCTS_QUERY = /* GraphQL */ `
+  ${PRODUCT_FIELDS}
+  query SearchedProducts($cursor: String, $query: String) {
+    products(
+      first: 250
+      after: $cursor
+      query: $query
+      sortKey: CREATED_AT
+      reverse: true
+    ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
+        ...ProductFields
+      }
+    }
+  }
+`;
+
 /** Shopify's own best-selling ranking; we only need the order of handles. */
 export const BEST_SELLING_QUERY = /* GraphQL */ `
   query BestSelling($first: Int!) {

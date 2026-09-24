@@ -9,7 +9,7 @@ import { ProductGrid } from "@/components/product-grid";
 import {
   DEPARTMENT_LABEL,
   getGenderNavigation,
-  getProductsByCollection,
+  getScopedCollectionProducts,
   type GenderNav,
 } from "@/lib/catalog";
 import {
@@ -20,7 +20,6 @@ import {
   type Filters,
 } from "@/lib/collection-view";
 import {
-  brandToSlug,
   collections,
   getCollection,
   isCollectionSlug,
@@ -135,16 +134,10 @@ export default async function CollectionPage({
     inStockOnly: query.available === "1",
   };
 
-  const catalog = await getProductsByCollection(slug);
   const department = isDepartment(query.department)
     ? query.department
     : undefined;
   const category = query.category?.trim() || undefined;
-  const scoped = catalog.filter((product) => {
-    if (department && product.department !== department) return false;
-    if (category && brandToSlug(product.subcategory) !== category) return false;
-    return true;
-  });
   const nav = await getGenderNavigation();
   const heading = categoryHeading(slug, category, department, nav);
   const genderItem = nav.find((entry) => entry.gender === slug);
@@ -173,6 +166,12 @@ export default async function CollectionPage({
     );
   }
 
+  const scoped = await getScopedCollectionProducts({
+    slug,
+    category,
+    department,
+    nav,
+  });
   // Facets describe the scoped collection, so counts match what you see.
   const facets = buildFacets(scoped);
   const items = sortProducts(filterProducts(scoped, filters), sort);
@@ -204,7 +203,7 @@ export default async function CollectionPage({
           facets={facets}
         />
       </Suspense>
-      <ProductGrid products={items} />
+      <ProductGrid products={items} pageSize={25} />
     </div>
   );
 }

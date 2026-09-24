@@ -15,7 +15,11 @@ import {
   type MappedProduct,
   type ShopifyProductNode,
 } from "@/lib/shopify/map-product";
-import { ALL_PRODUCTS_QUERY, BEST_SELLING_QUERY } from "@/lib/shopify/queries";
+import {
+  ALL_PRODUCTS_QUERY,
+  BEST_SELLING_QUERY,
+  SEARCHED_PRODUCTS_QUERY,
+} from "@/lib/shopify/queries";
 import { shopifyStorefrontGraphql } from "@/lib/shopify/storefront";
 import { preferAvailable } from "@/lib/collection-view";
 import {
@@ -108,6 +112,155 @@ async function fetchAllProducts() {
   } while (cursor);
 
   return nodes;
+}
+
+async function fetchProductsByQuery(query: string) {
+  const nodes: ShopifyProductNode[] = [];
+  let cursor: string | null = null;
+
+  do {
+    const data: AllProductsResponse =
+      await shopifyStorefrontGraphql<AllProductsResponse>(
+        SEARCHED_PRODUCTS_QUERY,
+        { cursor, query },
+        fetchOptions,
+      );
+    nodes.push(...data.products.nodes);
+    cursor = data.products.pageInfo.hasNextPage
+      ? data.products.pageInfo.endCursor
+      : null;
+  } while (cursor);
+
+  return nodes;
+}
+
+function tagTerm(tag: string) {
+  return `tag:'${tag.replace(/'/g, "\\'")}'`;
+}
+
+function mapAvailableNodes(nodes: ShopifyProductNode[]) {
+  return applyInventoryQuantities(
+    nodes
+      .map(mapShopifyProduct)
+      .filter((product) => product.images.length > 0 && product.variants.length > 0),
+    null,
+  ).filter((product) => product.available);
+}
+
+function collectionSearchQuery({
+  gender,
+  categoryName,
+  categorySlug,
+  categoryNames,
+}: {
+  gender: Gender;
+  categoryName?: string;
+  categorySlug?: string;
+  categoryNames?: string[];
+}) {
+  const genderClause = `(${tagTerm(`Gender_${gender}`)} OR ${tagTerm(`Gender_${gender === "women" ? "Women" : "Men"}`)})`;
+
+  if (categoryName || categorySlug) {
+    const names = [...new Set([categoryName, categorySlug].filter(Boolean))];
+    const tags = names.map((name) => tagTerm(`Subcategory_${name}`)).join(" OR ");
+    return names.length === 1
+      ? `${genderClause} AND ${tags}`
+      : `${genderClause} AND (${tags})`;
+  }
+
+  if (categoryNames && categoryNames.length > 0) {
+    const tags = categoryNames
+      .map((name) => tagTerm(`Subcategory_${name}`))
+      .join(" OR ");
+    return `${genderClause} AND (${tags})`;
+  }
+
+  return genderClause;
+}
+
+async function fetchScopedGenderProducts({
+  gender,
+  categoryName,
+  categorySlug,
+  categoryNames,
+}: {
+  gender: Gender;
+  categoryName?: string;
+  categorySlug?: string;
+  categoryNames?: string[];
+}) {
+  if (!isShopifyReady()) return [];
+
+  try {
+    const nodes = await fetchProductsByQuery(
+      collectionSearchQuery({
+        gender,
+        categoryName,
+        categorySlug,
+        categoryNames,
+      }),
+    );
+    return mapAvailableNodes(nodes);
+  } catch (error) {
+    console.error("Shopify scoped catalogue unavailable", error);
+    return [];
+  }
+}
+
+/**
+ * Women/Men grids ask Shopify for that gender (and subcategory) only.
+ * Results are still checked locally so men's trousers never appear on women.
+ */
+export async function getScopedCollectionProducts({
+  slug,
+  category,
+  department,
+  nav,
+}: {
+  slug: CollectionSlug;
+  category?: string;
+  department?: Department;
+  nav: GenderNav[];
+}): Promise<Product[]> {
+  if (slug !== "women" && slug !== "men") {
+    return getProductsByCollection(slug);
+  }
+
+  const gender = slug;
+  const item = nav.find((entry) => entry.gender === gender);
+  const categories = item?.departments.flatMap((entry) => entry.categories) ?? [];
+  const categoryName = category
+    ? categories.find((entry) => entry.slug === category)?.name
+    : undefined;
+  const departmentNames =
+    department && item
+      ? item.departments
+          .find((entry) => entry.slug === department)
+          ?.categories.map((entry) => entry.name)
+      : undefined;
+
+  let products = await fetchScopedGenderProducts({
+    gender,
+    categoryName,
+    categorySlug: category,
+    categoryNames: !category && department ? departmentNames : undefined,
+  });
+
+  const matchesScope = (product: Product) => {
+    if (product.gender !== gender) return false;
+    if (department && product.department !== department) return false;
+    if (category && brandToSlug(product.subcategory) !== category) return false;
+    return true;
+  };
+
+  products = products.filter(matchesScope);
+
+  // Wrong or missing tags would otherwise empty a real subcategory.
+  if (products.length === 0) {
+    products = (await getProductsByCollection(slug)).filter(matchesScope);
+  }
+
+  return products;
 }
 
 async function fetchBestSellingHandles() {
