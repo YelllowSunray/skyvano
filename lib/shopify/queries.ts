@@ -38,22 +38,6 @@ const PRODUCT_FIELDS = /* GraphQL */ `
  * Admin on-hand; `@inContext` would collapse it to "sellable online" and
  * mark the whole catalogue sold out.
  */
-export const ALL_PRODUCTS_QUERY = /* GraphQL */ `
-  ${PRODUCT_FIELDS}
-  query AllProducts($cursor: String) {
-    products(first: 250, after: $cursor, sortKey: CREATED_AT, reverse: true) {
-      pageInfo {
-        hasNextPage
-        endCursor
-      }
-      nodes {
-        ...ProductFields
-      }
-    }
-  }
-`;
-
-/** Same payload as AllProducts, narrowed by Shopify's product search query. */
 export const SEARCHED_PRODUCTS_QUERY = /* GraphQL */ `
   ${PRODUCT_FIELDS}
   query SearchedProducts($cursor: String, $query: String) {
@@ -75,12 +59,63 @@ export const SEARCHED_PRODUCTS_QUERY = /* GraphQL */ `
   }
 `;
 
-/** Shopify's own best-selling ranking; we only need the order of handles. */
+/** Newest products for homepage shelves and on-demand ISR seeds. */
+export const NEWEST_PRODUCTS_QUERY = /* GraphQL */ `
+  ${PRODUCT_FIELDS}
+  query NewestProducts($first: Int!) {
+    products(first: $first, sortKey: CREATED_AT, reverse: true) {
+      nodes {
+        ...ProductFields
+      }
+    }
+  }
+`;
+
+/** Shopify's own best-selling ranking, with enough fields to render cards. */
 export const BEST_SELLING_QUERY = /* GraphQL */ `
+  ${PRODUCT_FIELDS}
   query BestSelling($first: Int!) {
     products(first: $first, sortKey: BEST_SELLING) {
       nodes {
+        ...ProductFields
+      }
+    }
+  }
+`;
+
+/** One product page — never the rest of the shop. */
+export const PRODUCT_BY_HANDLE_QUERY = /* GraphQL */ `
+  ${PRODUCT_FIELDS}
+  query ProductByHandle($handle: String!) {
+    product(handle: $handle) {
+      ...ProductFields
+    }
+  }
+`;
+
+/**
+ * Header, brands, and sitemap only need tags and a thumbnail.
+ * Walking 7k SKUs is acceptable every 15 minutes; variants are not.
+ */
+export const NAV_PRODUCTS_QUERY = /* GraphQL */ `
+  query NavProducts($cursor: String) {
+    products(first: 250, after: $cursor) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      nodes {
         handle
+        title
+        vendor
+        productType
+        tags
+        availableForSale
+        images(first: 1) {
+          nodes {
+            url
+          }
+        }
       }
     }
   }

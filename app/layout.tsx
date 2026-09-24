@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
+import { Suspense } from "react";
 import { CartDrawer } from "@/components/cart-drawer";
 import { ClientCleanup } from "@/components/client-cleanup";
+import { RoutePending } from "@/components/route-pending";
 import { SearchModal } from "@/components/search-modal";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
@@ -12,8 +14,8 @@ import { DEFAULT_DESCRIPTION, DEFAULT_TITLE } from "@/lib/seo";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
-// Keep in sync with CATALOG_REVALIDATE_SECONDS; Next requires a literal here.
-export const revalidate = 60;
+// Keep in sync with NAV_REVALIDATE_SECONDS; Next requires a literal here.
+export const revalidate = 900;
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -85,6 +87,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <StoreProvider>
           <ClientCleanup />
           <SiteHeader brands={brands} genderNav={genderNav} />
+          <Suspense fallback={null}>
+            <RoutePending genderNav={genderNav} />
+          </Suspense>
           <main className="flex-1">{children}</main>
           <SiteFooter />
           <CartDrawer />

@@ -8,6 +8,9 @@ import { sortProducts } from "@/lib/collection-view";
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
+export const revalidate = 300;
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
   const brands = await getBrands();
   return brands.map((brand) => ({ slug: brand.slug }));

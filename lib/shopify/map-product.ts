@@ -7,16 +7,20 @@ import type {
   ProductVariant,
 } from "@/lib/products";
 
-export type ShopifyProductNode = {
-  id: string;
+/** Enough fields to place a product in the mega menu without variants. */
+export type ShopifyNavNode = {
   handle: string;
   title: string;
   vendor: string;
   productType: string;
   tags: string[];
   availableForSale: boolean;
-  descriptionHtml: string;
   images: { nodes: Array<{ url: string }> };
+};
+
+export type ShopifyProductNode = ShopifyNavNode & {
+  id: string;
+  descriptionHtml: string;
   variants: {
     nodes: Array<{
       id: string;
@@ -166,13 +170,15 @@ function tagValue(tags: string[], prefix: string) {
   return match ? match.slice(prefix.length + 1) : undefined;
 }
 
-function resolveGender(node: ShopifyProductNode): Gender {
+export function resolveGender(node: Pick<ShopifyNavNode, "tags" | "title">): Gender {
   const tag = tagValue(node.tags, "Gender")?.toLowerCase();
   if (tag === "women" || tag === "men") return tag;
   return /\bwomen\b/i.test(node.title) ? "women" : "men";
 }
 
-function resolveDepartment(node: ShopifyProductNode): Department {
+export function resolveDepartment(
+  node: Pick<ShopifyNavNode, "tags" | "productType">,
+): Department {
   const source = tagValue(node.tags, "Category") ?? node.productType;
   const value = source.toLowerCase();
   if (value.startsWith("accessories")) return "accessories";
@@ -180,7 +186,9 @@ function resolveDepartment(node: ShopifyProductNode): Department {
   return "clothing";
 }
 
-function resolveSubcategory(node: ShopifyProductNode) {
+export function resolveSubcategory(
+  node: Pick<ShopifyNavNode, "tags" | "productType">,
+) {
   const tag = tagValue(node.tags, "Subcategory");
   if (tag) return tag;
   const [, ...rest] = node.productType.split(" ");

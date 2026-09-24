@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllProducts, getBrands } from "@/lib/catalog";
+import { getBrands, getProductHandles } from "@/lib/catalog";
 import { collections } from "@/lib/products";
 import { absoluteUrl } from "@/lib/seo";
 
@@ -42,8 +42,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    const [products, brands] = await Promise.all([
-      getAllProducts(),
+    const [handles, brands] = await Promise.all([
+      getProductHandles(),
       getBrands(),
     ]);
     const now = new Date();
@@ -53,9 +53,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ...brands
         .filter((brand) => HANDLE.test(brand.slug))
         .map((brand) => entry(`/brands/${brand.slug}`, "weekly", 0.6, now)),
-      ...products
-        .filter((product) => HANDLE.test(product.slug))
-        .map((product) => entry(`/products/${product.slug}`, "daily", 0.7, now)),
+      ...handles
+        .filter((handle) => HANDLE.test(handle))
+        .map((handle) => entry(`/products/${handle}`, "daily", 0.7, now)),
     ];
   } catch {
     // An empty/failed catalogue must not 500 — crawlers would drop the site.

@@ -4,6 +4,8 @@ import { PageIntro } from "@/components/page-intro";
 import { ProductGrid } from "@/components/product-grid";
 import { searchProducts } from "@/lib/catalog";
 
+export const revalidate = 300;
+
 export const metadata: Metadata = {
   title: "Search",
   robots: { index: false, follow: false },

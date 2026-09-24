@@ -4,13 +4,16 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ProductCard } from "@/components/product-card";
 import { ProductDetail } from "@/components/product-detail";
 import { JsonLd } from "@/components/json-ld";
-import { getAllProducts, getProduct, getRelatedProducts } from "@/lib/catalog";
+import { getNewArrivals, getProduct, getRelatedProducts } from "@/lib/catalog";
 import { brandToSlug, type Product } from "@/lib/products";
 import { absoluteUrl, pageMetadata } from "@/lib/seo";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
+export const revalidate = 300;
+export const dynamicParams = true;
+
 export async function generateStaticParams() {
-  const products = await getAllProducts();
+  const products = await getNewArrivals(48);
   return products.map((product) => ({ slug: product.slug }));
 }
 

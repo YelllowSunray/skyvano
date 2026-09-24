@@ -19,6 +19,8 @@ import {
 } from "@/lib/seo";
 import { SITE_NAME } from "@/lib/site";
 
+export const revalidate = 300;
+
 export const metadata: Metadata = {
   ...pageMetadata({
     title: DEFAULT_TITLE,

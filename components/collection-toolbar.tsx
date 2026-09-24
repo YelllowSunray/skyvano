@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { startRoutePending } from "@/components/route-pending";
 import {
   countFilters,
   SORT_OPTIONS,
@@ -42,7 +43,9 @@ export function CollectionToolbar({
     const params = new URLSearchParams(searchParams.toString());
     mutate(params);
     const query = params.toString();
-    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    const href = query ? `${pathname}?${query}` : pathname;
+    startRoutePending(href);
+    router.push(href, { scroll: false });
   };
 
   const toggle = (param: string, value: string) =>

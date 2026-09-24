@@ -6,27 +6,32 @@ import { CollectionToolbar } from "@/components/collection-toolbar";
 import { GenderLanding } from "@/components/gender-landing";
 import { PageIntro, TextLink } from "@/components/page-intro";
 import { ProductGrid } from "@/components/product-grid";
+import { CollectionLoading } from "@/components/product-grid-skeleton";
 import {
-  DEPARTMENT_LABEL,
   getGenderNavigation,
   getScopedCollectionProducts,
   type GenderNav,
 } from "@/lib/catalog";
+import { collectionHeading, isDepartment } from "@/lib/collection-heading";
 import {
   buildFacets,
   filterProducts,
   isSortKey,
   sortProducts,
   type Filters,
+  type SortKey,
 } from "@/lib/collection-view";
 import {
   collections,
   getCollection,
   isCollectionSlug,
+  type CollectionSlug,
   type Department,
 } from "@/lib/products";
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
+
+export const revalidate = 300;
 
 export function generateStaticParams() {
   return collections.map((collection) => ({ slug: collection.slug }));
@@ -47,7 +52,7 @@ export async function generateMetadata({
 
   const query = await searchParams;
   const nav = await getGenderNavigation();
-  const heading = categoryHeading(
+  const heading = collectionHeading(
     slug,
     query.category,
     query.department,
@@ -74,42 +79,66 @@ type SearchParams = {
   all?: string;
 };
 
-const DEPARTMENTS = new Set<Department>(["clothing", "shoes", "accessories"]);
-
-function isDepartment(value: string | undefined): value is Department {
-  return Boolean(value && DEPARTMENTS.has(value as Department));
-}
-
-function categoryHeading(
-  slug: string,
-  category: string | undefined,
-  department: string | undefined,
-  nav: GenderNav[],
-) {
-  if (slug !== "women" && slug !== "men") return undefined;
-  const gender = slug === "women" ? "Women" : "Men";
-  const item = nav?.find((entry) => entry.gender === slug);
-  if (category) {
-    const name = item?.departments
-      .flatMap((entry) => entry.categories)
-      .find((entry) => entry.slug === category)?.name;
-    const label =
-      name ??
-      category
-        .split("-")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" ");
-    return `${gender}’s ${label}`;
-  }
-  if (isDepartment(department)) {
-    return `${gender}’s ${DEPARTMENT_LABEL[department]}`;
-  }
-  return undefined;
-}
-
 function toArray(value: string | string[] | undefined) {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
+}
+
+async function CollectionResults({
+  slug,
+  category,
+  department,
+  nav,
+  sort,
+  filters,
+  heading,
+  description,
+}: {
+  slug: CollectionSlug;
+  category?: string;
+  department?: Department;
+  nav: GenderNav[];
+  sort: SortKey;
+  filters: Filters;
+  heading?: string;
+  description: string;
+}) {
+  const scoped = await getScopedCollectionProducts({
+    slug,
+    category,
+    department,
+    nav,
+  });
+  const facets = buildFacets(scoped);
+  const items = sortProducts(filterProducts(scoped, filters), sort);
+
+  return (
+    <>
+      <PageIntro eyebrow="Collection" title={heading ?? titleFromSlug(slug)}>
+        {heading
+          ? `${items.length} ${items.length === 1 ? "piece" : "pieces"} in the Skyvano edit.`
+          : description}
+      </PageIntro>
+      <Suspense>
+        <CollectionToolbar
+          total={scoped.length}
+          shown={items.length}
+          sort={sort}
+          filters={filters}
+          facets={facets}
+        />
+      </Suspense>
+      <ProductGrid products={items} pageSize={25} />
+    </>
+  );
+}
+
+function titleFromSlug(slug: CollectionSlug) {
+  return getCollection(slug)?.title ?? "Collection";
+}
+
+function sortLabel(sort: string | undefined) {
+  return isSortKey(sort) ? sort : "featured";
 }
 
 export default async function CollectionPage({
@@ -126,7 +155,7 @@ export default async function CollectionPage({
   if (!collection) notFound();
 
   const query = await searchParams;
-  const sort = isSortKey(query.sort) ? query.sort : "featured";
+  const sort = sortLabel(query.sort);
   const filters: Filters = {
     brands: toArray(query.brand),
     sizes: toArray(query.size),
@@ -139,7 +168,7 @@ export default async function CollectionPage({
     : undefined;
   const category = query.category?.trim() || undefined;
   const nav = await getGenderNavigation();
-  const heading = categoryHeading(slug, category, department, nav);
+  const heading = collectionHeading(slug, category, department, nav);
   const genderItem = nav.find((entry) => entry.gender === slug);
   const showLanding =
     Boolean(genderItem?.departments.length) &&
@@ -166,15 +195,17 @@ export default async function CollectionPage({
     );
   }
 
-  const scoped = await getScopedCollectionProducts({
+  const scopeKey = [
     slug,
-    category,
-    department,
-    nav,
-  });
-  // Facets describe the scoped collection, so counts match what you see.
-  const facets = buildFacets(scoped);
-  const items = sortProducts(filterProducts(scoped, filters), sort);
+    category ?? "",
+    department ?? "",
+    query.all ?? "",
+    sort,
+    filters.brands.join(","),
+    filters.sizes.join(","),
+    filters.colours.join(","),
+    filters.inStockOnly ? "1" : "",
+  ].join(":");
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-16 md:px-8 md:pb-20">
@@ -189,21 +220,26 @@ export default async function CollectionPage({
           ...(heading ? [{ label: heading }] : []),
         ]}
       />
-      <PageIntro eyebrow="Collection" title={heading ?? collection.title}>
-        {heading
-          ? `${items.length} ${items.length === 1 ? "piece" : "pieces"} in the Skyvano edit.`
-          : collection.description}
-      </PageIntro>
-      <Suspense>
-        <CollectionToolbar
-          total={scoped.length}
-          shown={items.length}
+      <Suspense
+        key={scopeKey}
+        fallback={
+          <CollectionLoading
+            title={heading ?? collection.title}
+            flush
+          />
+        }
+      >
+        <CollectionResults
+          slug={slug}
+          category={category}
+          department={department}
+          nav={nav}
           sort={sort}
           filters={filters}
-          facets={facets}
+          heading={heading}
+          description={collection.description}
         />
       </Suspense>
-      <ProductGrid products={items} pageSize={25} />
     </div>
   );
 }
