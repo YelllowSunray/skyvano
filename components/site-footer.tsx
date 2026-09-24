@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { InstagramIcon, PinterestIcon, TikTokIcon } from "@/components/icons";
+import { InstagramIcon, TikTokIcon } from "@/components/icons";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { PaymentMarks } from "@/components/payment-marks";
 
@@ -96,21 +96,14 @@ export function SiteFooter() {
           <NewsletterForm dark />
           <div className="mt-6 flex items-center gap-2 text-gold">
             <a
-              href="https://instagram.com"
+              href="https://www.instagram.com/skyvano24/"
               aria-label="Instagram"
               className="flex h-11 w-11 items-center justify-center"
             >
               <InstagramIcon className="h-5 w-5" />
             </a>
             <a
-              href="https://pinterest.com"
-              aria-label="Pinterest"
-              className="flex h-11 w-11 items-center justify-center"
-            >
-              <PinterestIcon className="h-5 w-5" />
-            </a>
-            <a
-              href="https://tiktok.com"
+              href="https://www.tiktok.com/@skyvano.com"
               aria-label="TikTok"
               className="flex h-11 w-11 items-center justify-center"
             >
