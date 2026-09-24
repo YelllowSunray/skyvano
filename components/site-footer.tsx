@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { InstagramIcon, TikTokIcon } from "@/components/icons";
+import { InstagramIcon, SnapchatIcon, TikTokIcon } from "@/components/icons";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { PaymentMarks } from "@/components/payment-marks";
 
@@ -108,6 +108,13 @@ export function SiteFooter() {
               className="flex h-11 w-11 items-center justify-center"
             >
               <TikTokIcon className="h-5 w-5" />
+            </a>
+            <a
+              href="https://www.snapchat.com/add/skyvanolux"
+              aria-label="Snapchat"
+              className="flex h-11 w-11 items-center justify-center"
+            >
+              <SnapchatIcon className="h-5 w-5" />
             </a>
           </div>
         </div>
