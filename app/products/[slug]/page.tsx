@@ -4,16 +4,14 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ProductCard } from "@/components/product-card";
 import { ProductDetail } from "@/components/product-detail";
 import { JsonLd } from "@/components/json-ld";
-import { getProduct, getRelatedProducts } from "@/lib/catalog";
+import { getAllProducts, getProduct, getRelatedProducts } from "@/lib/catalog";
 import { brandToSlug, type Product } from "@/lib/products";
 import { absoluteUrl, pageMetadata } from "@/lib/seo";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
-export const dynamicParams = true;
-
-/** Built on first request, then cached. Prerendering every product made deploys stall. */
-export function generateStaticParams() {
-  return [];
+export async function generateStaticParams() {
+  const products = await getAllProducts();
+  return products.map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({
