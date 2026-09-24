@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageIntro, Prose } from "@/components/page-intro";
 import { pageMetadata } from "@/lib/seo";
+import { COMPANY } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "Privacy Policy",
@@ -16,16 +17,17 @@ export default function PrivacyPage() {
       </PageIntro>
       <Prose>
         <p>
-          Skyvano (“we”) processes personal data to run this store: your name,
-          email, delivery address, order history and, if you join the Skyvano
-          Club, newsletter preferences. Payments are handled by certified
-          processors; we do not store full card numbers.
+          {COMPANY.legalName} (“we”), trading as Skyvano, processes personal
+          data to run this store: your name, email, delivery address, order
+          history and, if you join the Skyvano Club, newsletter preferences.
+          Payments are handled by certified processors; we do not store full
+          card numbers.
         </p>
         <p className="mt-6">
           We use this information to fulfil orders, provide client care, prevent
           fraud and, with your consent, send collection updates. You may
           unsubscribe at any time. You can request access, correction or
-          deletion by writing to info@skyvano.com.
+          deletion by writing to {COMPANY.email}.
         </p>
         <p className="mt-6">
           We keep order records as required under Dutch and EU law. This site

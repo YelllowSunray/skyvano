@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact-form";
 import { PageIntro } from "@/components/page-intro";
 import { pageMetadata } from "@/lib/seo";
+import { COMPANY, companyAddressLines } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "Contact",
@@ -17,21 +18,33 @@ export default function ContactPage() {
       </PageIntro>
       <div className="grid gap-12 md:grid-cols-2">
         <div className="text-sm leading-7 text-muted">
-          <p className="font-serif text-3xl text-ink">Skyvano Atelier</p>
-          <p className="mt-4">Herengracht 120</p>
-          <p>1015 BT Amsterdam</p>
-          <p>The Netherlands</p>
+          <p className="font-serif text-3xl text-ink">{COMPANY.legalName}</p>
+          <p className="mt-1 text-[11px] uppercase tracking-[0.18em] text-gold">
+            Trading as {COMPANY.brandName}
+          </p>
+          <div className="mt-4">
+            {companyAddressLines().map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
           <p className="mt-6">
             Email
             <br />
-            <a href="mailto:info@skyvano.com" className="text-ink">
-              info@skyvano.com
+            <a href={`mailto:${COMPANY.email}`} className="text-ink">
+              {COMPANY.email}
             </a>
           </p>
           <p className="mt-4">
             Telephone
             <br />
-            +31 20 244 1800
+            <a href={`tel:${COMPANY.phone}`} className="text-ink">
+              {COMPANY.phoneDisplay}
+            </a>
+          </p>
+          <p className="mt-6">
+            KVK {COMPANY.kvk}
+            <br />
+            BTW-id {COMPANY.vatId}
           </p>
           <p className="mt-4">Monday–Friday, 9:00–18:00 CET</p>
         </div>

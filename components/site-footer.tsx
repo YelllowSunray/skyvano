@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CompanyImprint } from "@/components/company-imprint";
 import { InstagramIcon, SnapchatIcon, TikTokIcon } from "@/components/icons";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { PaymentMarks } from "@/components/payment-marks";
+import { COMPANY } from "@/lib/site";
 
 const shopLinks = [
   ["New Arrivals", "/collections/new-arrivals"],
@@ -122,13 +124,19 @@ export function SiteFooter() {
 
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 text-xs text-white/50 md:flex-row md:items-center md:justify-between md:px-8">
-          <p>© {new Date().getFullYear()} Skyvano. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} {COMPANY.legalName}. All rights
+            reserved.
+          </p>
           <PaymentMarks />
         </div>
+        <div className="mx-auto max-w-7xl px-4 pb-6 md:px-8">
+          <CompanyImprint tone="dark" />
+        </div>
         <p className="mx-auto max-w-7xl px-4 pb-8 text-[11px] leading-5 text-white/40 md:px-8">
-          Skyvano is an independent luxury retailer. Designer names are used to
-          identify the origin of the pieces we offer and do not imply
-          affiliation with or endorsement by those houses.
+          Skyvano is an independent luxury retailer operated by {COMPANY.legalName}.
+          Designer names are used to identify the origin of the pieces we offer
+          and do not imply affiliation with or endorsement by those houses.
         </p>
       </div>
     </footer>

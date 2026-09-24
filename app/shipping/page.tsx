@@ -12,7 +12,7 @@ export default function ShippingPage() {
   return (
     <>
       <PageIntro eyebrow="Help" title="Shipping & delivery">
-        Fast, tracked European delivery from our Amsterdam atelier.
+        Fast, tracked European delivery from the Netherlands.
       </PageIntro>
       <Prose>
         <h2 className="mb-3 font-serif text-3xl text-ink">Costs</h2>

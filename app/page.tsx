@@ -17,7 +17,7 @@ import {
   absoluteUrl,
   pageMetadata,
 } from "@/lib/seo";
-import { SITE_NAME } from "@/lib/site";
+import { COMPANY, SITE_NAME } from "@/lib/site";
 
 export const revalidate = 300;
 
@@ -48,16 +48,23 @@ export default async function Home() {
             "@context": "https://schema.org",
             "@type": "Organization",
             name: SITE_NAME,
+            legalName: COMPANY.legalName,
             url: absoluteUrl("/"),
             logo: absoluteUrl("/logo.png"),
-            email: "info@skyvano.com",
-            telephone: "+31 20 244 1800",
+            email: COMPANY.email,
+            telephone: COMPANY.phoneDisplay,
+            vatID: COMPANY.vatId,
+            identifier: {
+              "@type": "PropertyValue",
+              name: "KVK",
+              value: COMPANY.kvk,
+            },
             address: {
               "@type": "PostalAddress",
-              streetAddress: "Herengracht 120",
-              addressLocality: "Amsterdam",
-              postalCode: "1015 BT",
-              addressCountry: "NL",
+              streetAddress: COMPANY.streetAddress,
+              addressLocality: COMPANY.addressLocality,
+              postalCode: COMPANY.postalCode,
+              addressCountry: COMPANY.addressCountry,
             },
           },
           {

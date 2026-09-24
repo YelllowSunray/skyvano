@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageIntro, Prose } from "@/components/page-intro";
 import { pageMetadata } from "@/lib/seo";
+import { COMPANY } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "Terms & Conditions",
@@ -29,9 +30,12 @@ export default function TermsPage() {
           a piece has been personalised or unsealed for hygiene reasons.
         </p>
         <p className="mt-6">
-          These terms are governed by the laws of the Netherlands. Skyvano is an
-          independent retailer and is not affiliated with the designer houses
-          whose names appear on product pages.
+          These terms are governed by the laws of the Netherlands. Skyvano is
+          operated by {COMPANY.legalName}, KVK {COMPANY.kvk}, BTW-id{" "}
+          {COMPANY.vatId}, {COMPANY.streetAddress}, {COMPANY.postalCode}{" "}
+          {COMPANY.addressLocality}. We are an independent retailer and are not
+          affiliated with the designer houses whose names appear on product
+          pages.
         </p>
       </Prose>
     </>
