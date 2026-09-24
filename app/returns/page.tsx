@@ -23,7 +23,7 @@ export default function ReturnsPage() {
         </p>
         <h2 className="mb-3 mt-10 font-serif text-3xl text-ink">How to return</h2>
         <ol className="list-decimal space-y-3 pl-5">
-          <li>Email hello@skyvano.com with your order number.</li>
+          <li>Email info@skyvano.com with your order number.</li>
           <li>We send a prepaid European return label.</li>
           <li>Drop the parcel at a DHL or UPS point within 7 days.</li>
           <li>Refunds are issued to the original payment method within 5 working days of inspection.</li>

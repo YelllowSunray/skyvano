@@ -24,8 +24,8 @@ export default function ContactPage() {
           <p className="mt-6">
             Email
             <br />
-            <a href="mailto:hello@skyvano.com" className="text-ink">
-              hello@skyvano.com
+            <a href="mailto:info@skyvano.com" className="text-ink">
+              info@skyvano.com
             </a>
           </p>
           <p className="mt-4">

@@ -25,7 +25,7 @@ export default function PrivacyPage() {
           We use this information to fulfil orders, provide client care, prevent
           fraud and, with your consent, send collection updates. You may
           unsubscribe at any time. You can request access, correction or
-          deletion by writing to hello@skyvano.com.
+          deletion by writing to info@skyvano.com.
         </p>
         <p className="mt-6">
           We keep order records as required under Dutch and EU law. This site

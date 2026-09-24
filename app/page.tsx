@@ -48,7 +48,7 @@ export default async function Home() {
             name: SITE_NAME,
             url: absoluteUrl("/"),
             logo: absoluteUrl("/logo.png"),
-            email: "hello@skyvano.com",
+            email: "info@skyvano.com",
             telephone: "+31 20 244 1800",
             address: {
               "@type": "PostalAddress",

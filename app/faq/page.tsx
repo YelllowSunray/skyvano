@@ -28,7 +28,7 @@ const faqs = [
   },
   {
     q: "How do I choose a size?",
-    a: "Each product page lists available sizes. If you are between sizes, we generally recommend the larger option for tailoring and the listed size for leather. Email hello@skyvano.com with your usual size and we will advise.",
+    a: "Each product page lists available sizes. If you are between sizes, we generally recommend the larger option for tailoring and the listed size for leather. Email info@skyvano.com with your usual size and we will advise.",
   },
   {
     q: "Which payment methods do you accept?",
