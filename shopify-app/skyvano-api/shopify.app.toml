@@ -12,7 +12,7 @@ automatically_update_urls_on_dev = false
 api_version = "2026-07"
 
 [access_scopes]
-scopes = "read_products,read_inventory,read_locations,read_orders,read_customers"
+scopes = "read_products,read_inventory,read_locations,read_orders,read_customers,write_customers"
 
 [auth]
 redirect_urls = [ "https://shopify.dev/apps/default-app-home/api/auth" ]
