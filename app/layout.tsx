@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
 import { Suspense } from "react";
 import { CartDrawer } from "@/components/cart-drawer";
@@ -96,6 +97,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <SearchModal brands={searchBrands} />
           <Toast />
         </StoreProvider>
+        <Analytics />
       </body>
     </html>
   );
