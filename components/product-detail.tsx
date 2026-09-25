@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/button";
 import { useStore } from "@/components/store-provider";
 import { formatPrice } from "@/lib/format";
+import { META_CURRENCY, metaTrack } from "@/lib/meta-pixel";
 import type { Product, ProductVariant } from "@/lib/products";
 
 /** Preselects the size only when there is exactly one a shopper could buy. */
@@ -31,6 +32,17 @@ export function ProductDetail({ product }: { product: Product }) {
   );
   const [size, setSize] = useState(onlyAvailableSize(product.variants));
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    metaTrack("ViewContent", {
+      content_ids: [product.id],
+      content_type: "product",
+      content_name: product.name,
+      content_category: product.brand,
+      value: product.price,
+      currency: META_CURRENCY,
+    });
+  }, [product.brand, product.id, product.name, product.price]);
 
   const productSoldOut = !product.variants.some((variant) => variant.available);
 

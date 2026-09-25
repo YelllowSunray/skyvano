@@ -8,6 +8,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { META_CURRENCY, metaTrack } from "@/lib/meta-pixel";
 import type { Product } from "@/lib/products";
 
 export type CartItem = {
@@ -163,6 +164,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       });
       setIsCartOpen(true);
       setToast("Added to bag");
+      metaTrack("AddToCart", {
+        content_ids: [product.id],
+        content_type: "product",
+        content_name: product.name,
+        content_category: product.brand,
+        value: variant?.price ?? product.price,
+        currency: META_CURRENCY,
+      });
     },
     [],
   );

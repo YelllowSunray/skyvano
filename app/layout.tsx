@@ -4,6 +4,7 @@ import { Cormorant_Garamond, Outfit } from "next/font/google";
 import { Suspense } from "react";
 import { CartDrawer } from "@/components/cart-drawer";
 import { ClientCleanup } from "@/components/client-cleanup";
+import { MetaPixel } from "@/components/meta-pixel";
 import { RoutePending } from "@/components/route-pending";
 import { SearchModal } from "@/components/search-modal";
 import { SiteFooter } from "@/components/site-footer";
@@ -12,6 +13,7 @@ import { StoreProvider } from "@/components/store-provider";
 import { Toast } from "@/components/toast";
 import { getBrands, getGenderNavigation } from "@/lib/catalog";
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE } from "@/lib/seo";
+import { isMetaPixelId, META_PIXEL_ID } from "@/lib/meta-pixel";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
@@ -98,6 +100,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <Toast />
         </StoreProvider>
         <Analytics />
+        {isMetaPixelId(META_PIXEL_ID) ? (
+          <Suspense fallback={null}>
+            <MetaPixel pixelId={META_PIXEL_ID} />
+          </Suspense>
+        ) : null}
       </body>
     </html>
   );

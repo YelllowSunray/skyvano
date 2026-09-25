@@ -8,6 +8,7 @@ import { PageIntro } from "@/components/page-intro";
 import { ShippingProgress } from "@/components/shipping-progress";
 import { useStore } from "@/components/store-provider";
 import { formatPrice } from "@/lib/format";
+import { META_CURRENCY, metaTrack } from "@/lib/meta-pixel";
 import { PAYMENT_METHODS_COPY } from "@/lib/payments";
 
 export default function CartPage() {
@@ -53,6 +54,14 @@ export default function CartPage() {
         setPending(false);
         return;
       }
+
+      metaTrack("InitiateCheckout", {
+        content_ids: cart.map((item) => item.productId),
+        content_type: "product",
+        num_items: cart.reduce((sum, item) => sum + item.quantity, 0),
+        value: cartTotal,
+        currency: META_CURRENCY,
+      });
 
       // Shopify hosts the payment step. The bag stays put until the order is
       // confirmed, so a shopper who backs out still has it.

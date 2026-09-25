@@ -31,8 +31,9 @@ export default function PrivacyPage() {
         </p>
         <p className="mt-6">
           We keep order records as required under Dutch and EU law. This site
-          uses essential cookies for the bag and session, and optional analytics
-          cookies only if you accept them.
+          uses essential cookies for the bag and session. We also use Vercel
+          Analytics and the Meta Pixel to measure visits, ads, and shopping
+          events.
         </p>
       </Prose>
     </>
