@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { BagIcon, CloseIcon, HomeIcon, MenuIcon, SearchIcon } from "@/components/icons";
+import { BagIcon, CloseIcon, HomeIcon, MenuIcon, SearchIcon, UserIcon } from "@/components/icons";
 import { Marquee } from "@/components/marquee";
 import { useStore } from "@/components/store-provider";
 import { NavbarBackButton } from "@/components/smart-back";
 import type { Brand, GenderNav } from "@/lib/catalog";
+import { SHOPIFY_ACCOUNT_URL } from "@/lib/site";
 
 const leftPlain = [{ href: "/collections/new-arrivals", label: "New Arrivals" }];
 
@@ -316,6 +317,16 @@ export function SiteHeader({
               )}
             </nav>
             <div className="flex shrink-0 items-center gap-0.5 xl:border-l xl:border-line xl:pl-3">
+              <a
+                href={SHOPIFY_ACCOUNT_URL}
+                className="flex h-11 shrink-0 items-center gap-1.5 px-1.5 text-ink/80 transition-colors hover:text-gold"
+                aria-label="Account"
+              >
+                <UserIcon />
+                <span className="hidden text-[11px] uppercase tracking-[0.18em] lg:inline">
+                  Account
+                </span>
+              </a>
               <button
                 type="button"
                 className="flex h-11 w-11 shrink-0 items-center justify-center"
@@ -405,6 +416,13 @@ export function SiteHeader({
                 {item.label}
               </Link>
             ))}
+            <a
+              href={SHOPIFY_ACCOUNT_URL}
+              onClick={closeMenu}
+              className="py-2 font-serif text-3xl tracking-wide sm:text-4xl"
+            >
+              Account
+            </a>
             <div className="mt-6 grid gap-3 border-t border-line pt-6 text-sm uppercase tracking-[0.2em] text-muted">
               <button
                 type="button"

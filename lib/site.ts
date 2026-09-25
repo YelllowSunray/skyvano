@@ -3,6 +3,9 @@ export const SITE_URL = "https://skyvano.com";
 
 export const SITE_NAME = "Skyvano";
 
+/** Shopify New customer accounts — orders and profile (Admin → Customer accounts). */
+export const SHOPIFY_ACCOUNT_URL = "https://shopify.com/108213731669/account";
+
 /** Legal entity behind the Skyvano shop — required on Dutch webshops. */
 export const COMPANY = {
   legalName: "Skyz Inc",

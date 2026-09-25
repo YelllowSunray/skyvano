@@ -4,7 +4,7 @@ import { CompanyImprint } from "@/components/company-imprint";
 import { InstagramIcon, SnapchatIcon, TikTokIcon } from "@/components/icons";
 import { NewsletterForm } from "@/components/newsletter-form";
 import { PaymentMarks } from "@/components/payment-marks";
-import { COMPANY } from "@/lib/site";
+import { COMPANY, SHOPIFY_ACCOUNT_URL } from "@/lib/site";
 
 const shopLinks = [
   ["New Arrivals", "/collections/new-arrivals"],
@@ -16,6 +16,7 @@ const shopLinks = [
 ];
 
 const helpLinks = [
+  ["Account", SHOPIFY_ACCOUNT_URL],
   ["Contact", "/contact"],
   ["Shipping & Delivery", "/shipping"],
   ["Returns", "/returns"],
