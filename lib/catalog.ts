@@ -29,9 +29,9 @@ import { shopifyStorefrontGraphql } from "@/lib/shopify/storefront";
 import { preferAvailable } from "@/lib/collection-view";
 
 /** Listing fetches (category grids, shelves, PDPs). Next requires a literal at the call site. */
-export const CATALOG_REVALIDATE_SECONDS = 300;
+export const CATALOG_REVALIDATE_SECONDS = 3600;
 /** Header mega menu and brand list — a small payload, refreshed less often. */
-export const NAV_REVALIDATE_SECONDS = 900;
+export const NAV_REVALIDATE_SECONDS = 7200;
 export const CATALOG_TAG = "shopify-catalog-stock";
 export const NAV_TAG = "shopify-nav";
 

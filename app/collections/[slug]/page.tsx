@@ -31,7 +31,7 @@ import {
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
-export const revalidate = 300;
+export const revalidate = 3600;
 
 export function generateStaticParams() {
   return collections.map((collection) => ({ slug: collection.slug }));

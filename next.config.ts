@@ -9,6 +9,8 @@ const shopifyStore =
 const nextConfig: NextConfig = {
   trailingSlash: false,
   images: {
+    loader: "custom",
+    loaderFile: "./lib/shopify-image-loader.ts",
     remotePatterns: [
       {
         protocol: "https",

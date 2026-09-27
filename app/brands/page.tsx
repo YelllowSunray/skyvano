@@ -4,7 +4,7 @@ import { PageIntro } from "@/components/page-intro";
 import { getBrands } from "@/lib/catalog";
 import { pageMetadata } from "@/lib/seo";
 
-export const revalidate = 900;
+export const revalidate = 7200;
 
 export const metadata: Metadata = pageMetadata({
   title: "Brands",
