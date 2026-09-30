@@ -18,7 +18,7 @@ import { SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 // Keep in sync with NAV_REVALIDATE_SECONDS; Next requires a literal here.
-export const revalidate = 7200;
+export const revalidate = 86400;
 
 const outfit = Outfit({
   variable: "--font-outfit",

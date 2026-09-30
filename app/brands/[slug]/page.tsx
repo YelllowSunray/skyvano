@@ -3,20 +3,16 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PageIntro } from "@/components/page-intro";
 import { ProductGrid } from "@/components/product-grid";
-import { getBrandBySlug, getBrands, getProductsByBrand } from "@/lib/catalog";
+import { getBrandBySlug, getProductsByBrand } from "@/lib/catalog";
 import { sortProducts } from "@/lib/collection-view";
 import { pageMetadata } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const brands = await getBrands();
-  return [...brands]
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 12)
-    .map((brand) => ({ slug: brand.slug }));
+  return [];
 }
 
 export async function generateMetadata({

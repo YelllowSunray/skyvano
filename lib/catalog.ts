@@ -28,10 +28,10 @@ import {
 import { shopifyStorefrontGraphql } from "@/lib/shopify/storefront";
 import { preferAvailable } from "@/lib/collection-view";
 
-/** Listing fetches (category grids, shelves, PDPs). Next requires a literal at the call site. */
-export const CATALOG_REVALIDATE_SECONDS = 3600;
-/** Header mega menu and brand list — a small payload, refreshed less often. */
-export const NAV_REVALIDATE_SECONDS = 7200;
+/** Listing fetches. Daily is enough for a 7k dropship catalog and keeps ISR writes down. */
+export const CATALOG_REVALIDATE_SECONDS = 86400;
+/** Header mega menu and brand list. */
+export const NAV_REVALIDATE_SECONDS = 86400;
 export const CATALOG_TAG = "shopify-catalog-stock";
 export const NAV_TAG = "shopify-nav";
 

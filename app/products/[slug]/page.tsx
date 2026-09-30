@@ -4,17 +4,17 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ProductCard } from "@/components/product-card";
 import { ProductDetail } from "@/components/product-detail";
 import { JsonLd } from "@/components/json-ld";
-import { getNewArrivals, getProduct, getRelatedProducts } from "@/lib/catalog";
+import { getProduct, getRelatedProducts } from "@/lib/catalog";
 import { brandToSlug, type Product } from "@/lib/products";
 import { absoluteUrl, pageMetadata } from "@/lib/seo";
 import { SITE_NAME, SITE_URL } from "@/lib/site";
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 export const dynamicParams = true;
 
+/** Do not prerender thousands of PDPs. First visit caches the page for a day. */
 export async function generateStaticParams() {
-  const products = await getNewArrivals(48);
-  return products.map((product) => ({ slug: product.slug }));
+  return [];
 }
 
 export async function generateMetadata({

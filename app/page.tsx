@@ -19,7 +19,7 @@ import {
 } from "@/lib/seo";
 import { COMPANY, SITE_NAME } from "@/lib/site";
 
-export const revalidate = 3600;
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   ...pageMetadata({
